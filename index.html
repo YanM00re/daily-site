@@ -12,133 +12,526 @@
 <link rel="manifest" href="manifest.webmanifest">
 <style>
 :root{
-  --bg:#eceae6; --panel:#f8f7f4; --ink:#212121; --ink2:#4e4e4e;
+  --bg:#eceae6; --panel:#f8f7f4; --panel2:#f8f7f4; --ink:#212121; --ink2:#4e4e4e;
   --ink3:#8b8b88; --line:#dcdad4; --accent:#e0503a; --ok:#4f8a4a;
   --gold:#c9932f; --radius:6px; --body:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",sans-serif; --head:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",sans-serif;
   --mono:ui-monospace,"SF Mono",Menlo,monospace;
+  --red:#ff3b4e; --blue:#3d8bff; --orange:#ff9f3d; --grey:#8a8f98;
+  --lime:#a8e05f; --amber:#ffb86b; --cyan:#4fd1d8; --violet:#b18cff;
 }
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;
-line-height:1.6;-webkit-font-smoothing:antialiased}
-.wrap{max-width:820px;margin:0 auto;padding:36px 22px 90px}
-h1{font-family:var(--head);font-size:34px;line-height:1.15;margin:0 0 6px}
-h2{font-family:var(--head);font-size:21px;margin:0 0 12px}
-h3{font-family:var(--head);font-size:18px;margin:20px 0 8px}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;
+line-height:1.55;-webkit-font-smoothing:antialiased}
+.wrap{max-width:960px;margin:0 auto;padding:28px 22px 80px}
 a{color:var(--accent);text-decoration:none;border-bottom:1px solid color-mix(in srgb,var(--accent) 35%,transparent)}
-.date{color:var(--ink3);font-size:14px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:14px}
-.lead{color:var(--ink2);margin:0 0 22px}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:calc(var(--radius) + 4px);
-padding:6px 18px;margin:12px 0}
+h1{font-family:var(--head);font-size:32px;margin:0 0 6px;line-height:1.15}
+h2{font-family:var(--head);font-size:19px;margin:0}
+h3{font-family:var(--head);font-size:17px;margin:20px 0 8px}
+.date{color:var(--ink3);font-size:13px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px}
+.lead{color:var(--ink2);margin:0 0 18px}
+.meta{color:var(--ink3);font-size:13px;margin-top:36px;border-top:1px solid var(--line);padding-top:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:calc(var(--radius) + 4px);padding:8px 18px;margin:12px 0}
 ul{padding-left:22px;margin:10px 0} li{margin:6px 0}
-code{background:var(--panel);padding:1px 6px;border-radius:5px;font-size:15px}
-.meta{color:var(--ink3);font-size:14px;margin-top:40px;border-top:1px solid var(--line);padding-top:14px}
+code{background:var(--panel);padding:1px 6px;border-radius:5px;font-size:14px}
+.hidden{display:none!important}
+
+/* шапка-консоль */
+.console{display:flex;gap:14px;align-items:stretch;margin-bottom:20px;flex-wrap:wrap}
+.clock{flex:0 1 200px;background:var(--panel);border:1px solid var(--line);border-radius:calc(var(--radius) + 4px);
+  padding:16px 20px;min-width:170px;display:flex;flex-direction:column;justify-content:center;gap:2px}
+.clock .t{font-family:var(--mono);font-size:34px;font-variant-numeric:tabular-nums;letter-spacing:.02em;line-height:1}
+.clock .d{color:var(--ink3);font-size:12px;letter-spacing:.12em;text-transform:uppercase;margin-top:8px}
+.day{flex:1 1 320px;background:var(--panel);border:1px solid var(--line);border-radius:calc(var(--radius) + 4px);
+  padding:16px 20px;display:flex;flex-direction:column;justify-content:center;gap:10px}
+.day .title{display:flex;justify-content:space-between;align-items:baseline;font-size:14px;color:var(--ink2)}
+.day .title b{color:var(--ink);font-size:15px}
+.track{position:relative;height:10px;background:var(--bg);border-radius:6px;overflow:visible}
+.track .fill{position:absolute;inset:0;width:0;background:linear-gradient(90deg,var(--orange),var(--red));
+  border-radius:6px;transition:width .6s ease}
+.track .mark{position:absolute;top:-3px;width:4px;height:16px;border-radius:2px;background:var(--ink);
+  box-shadow:0 0 8px rgba(255,255,255,.35);transition:left .6s ease}
+.day .legend{display:flex;gap:14px;font-size:12px;color:var(--ink3);flex-wrap:wrap}
+.day .legend span b{color:var(--ink2);font-weight:500}
+.day.night .fill{background:linear-gradient(90deg,var(--ink3),var(--ink2))}
 
 /* поиск */
-.search{position:sticky;top:0;z-index:5;background:var(--bg);padding:10px 0 14px;margin-bottom:6px;
-border-bottom:1px solid var(--line)}
-.search input{width:100%;font:inherit;background:var(--panel);border:1px solid var(--line);
-color:var(--ink);padding:11px 14px;border-radius:calc(var(--radius) + 2px);outline:none}
-.search input:focus{border-color:var(--accent)}
+.search{position:sticky;top:0;z-index:5;background:linear-gradient(var(--bg) 78%,transparent);
+  padding:10px 0 14px;border-bottom:1px solid var(--line)}
+.search input{width:100%;font:inherit;background:var(--panel);border:1px solid var(--line);color:var(--ink);
+  padding:12px 16px;border-radius:var(--radius);outline:none;transition:border-color .15s, box-shadow .15s}
+.search input:focus{border-color:var(--orange);box-shadow:0 0 0 3px color-mix(in srgb,var(--orange) 20%,transparent)}
 .search .hint{color:var(--ink3);font-size:12px;margin-top:6px}
 
-/* блоки-секции: сворачиваются, как в Обсидиане */
-details.section{margin:22px 0}
-details.section > summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px;
-margin:0 0 10px;user-select:none}
+/* секции: сворачиваются */
+details.section{margin:20px 0}
+details.section > summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;user-select:none}
 details.section > summary::-webkit-details-marker{display:none}
 details.section > summary h2{margin:0;flex:1}
-details.section > summary .chev{color:var(--ink3);font-size:13px;transition:transform .15s;display:inline-block}
+details.section .chev{color:var(--ink3);transition:transform .18s;font-size:13px}
 details.section[open] > summary .chev{transform:rotate(90deg)}
-details.section > summary:hover .chev{color:var(--accent)}
-.section-tools{display:flex;gap:6px;align-items:center}
-.section-tools form{margin:0}
+details.section > summary:hover .chev{color:var(--red)}
+.sec-tools{display:flex;gap:4px;align-items:center}
+.sec-tools form{margin:0}
+.sec-tools button{font:inherit;background:transparent;border:1px solid var(--line);color:var(--ink3);
+  font-size:12px;padding:3px 8px;border-radius:8px;cursor:pointer}
+.sec-tools button:hover{color:var(--red);border-color:var(--red)}
 
-/* записи дневника */
-details.entry{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
-padding:0 14px;margin:8px 0}
-details.entry[open]{padding-bottom:12px}
-details.entry summary{cursor:pointer;list-style:none;padding:11px 0;display:flex;gap:10px;align-items:baseline}
-details.entry summary::-webkit-details-marker{display:none}
-details.entry summary .time{color:var(--ink3);font-size:13px;font-variant-numeric:tabular-nums;flex:none}
-details.entry summary .peek{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--ink2)}
-details.entry summary .chev{color:var(--ink3);font-size:12px;transition:.15s}
-details.entry[open] summary .chev{transform:rotate(90deg)}
-.entry-body{color:var(--ink);padding:2px 0 0 0}
-.comments{margin:12px 0 0;padding:10px 12px;background:var(--bg);border-radius:var(--radius);
-border:1px solid var(--line)}
-.comments .c{margin:6px 0;color:var(--ink2);font-size:15px}
-.comments .c b{color:var(--ink3);font-weight:400;font-size:13px;margin-right:8px}
-.cform{display:flex;gap:8px;margin-top:8px}
-.cform input{flex:1;font:inherit;background:var(--panel);border:1px solid var(--line);color:var(--ink);
-padding:7px 10px;border-radius:calc(var(--radius) - 2px);outline:none}
-.cform input:focus{border-color:var(--accent)}
+/* светодиоды */
+.led{width:9px;height:9px;border-radius:50%;background:var(--ink3);flex:none;
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--ink3) 14%,transparent)}
+.led.grey{background:var(--grey);box-shadow:0 0 8px color-mix(in srgb,var(--grey) 40%,transparent),0 0 0 3px color-mix(in srgb,var(--grey) 14%,transparent)}
+.led.orange{background:var(--orange);box-shadow:0 0 10px color-mix(in srgb,var(--orange) 55%,transparent),0 0 0 3px color-mix(in srgb,var(--orange) 14%,transparent)}
+.led.red{background:var(--red);box-shadow:0 0 10px color-mix(in srgb,var(--red) 55%,transparent),0 0 0 3px color-mix(in srgb,var(--red) 14%,transparent)}
+.led.blue{background:var(--blue);box-shadow:0 0 10px color-mix(in srgb,var(--blue) 55%,transparent),0 0 0 3px color-mix(in srgb,var(--blue) 14%,transparent)}
+
+/* дела */
+.tasks{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:10px;margin-top:12px}
+.task{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:13px 15px;
+  display:flex;gap:12px;align-items:flex-start;transition:transform .15s ease, border-color .15s, box-shadow .15s}
+.task:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--orange) 45%,transparent);
+  box-shadow:0 10px 26px rgba(0,0,0,.3)}
+.task .led{margin-top:7px}
+.task .t{flex:1;min-width:0}
+.task .title{font-size:16px;line-height:1.35;display:block}
+.task .meta{color:var(--ink3);font-size:12px;letter-spacing:.06em;text-transform:uppercase;margin-top:4px}
+.task.important{border-color:color-mix(in srgb,var(--red) 50%,transparent)}
+.task.done{opacity:.62}
+.task.done .title{text-decoration:line-through;text-decoration-color:var(--ink3)}
+.chip{font-family:var(--mono);font-size:11px;letter-spacing:.06em;padding:3px 8px;border-radius:8px;
+  border:1px solid var(--line);color:var(--ink3);white-space:nowrap;margin-top:2px}
+.chip.grey{color:var(--grey);border-color:color-mix(in srgb,var(--grey) 40%,transparent)}
+.chip.orange{color:var(--orange);border-color:color-mix(in srgb,var(--orange) 40%,transparent)}
+.chip.red{color:var(--red);border-color:color-mix(in srgb,var(--red) 45%,transparent)}
+.chip.blue{color:var(--blue);border-color:color-mix(in srgb,var(--blue) 40%,transparent)}
+
+/* дневник */
+.timeline{margin-top:12px;border-left:2px solid var(--line);padding-left:16px;display:grid;gap:10px}
+.tentry{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:11px 14px;cursor:pointer;
+  transition:border-color .15s, transform .15s}
+.tentry:hover{border-color:color-mix(in srgb,var(--orange) 40%,transparent);transform:translateX(2px)}
+.tentry .head{display:flex;gap:10px;align-items:baseline}
+.tentry .time{font-family:var(--mono);font-size:13px;color:var(--blue);flex:none;font-variant-numeric:tabular-nums}
+.tentry .peek{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--ink2)}
+.tentry .body{display:none;margin-top:8px;color:var(--ink);border-top:1px dashed var(--line);padding-top:8px}
+.tentry.open .body{display:block}
+.tentry.open .peek{white-space:normal;color:var(--ink)}
+.cmt{margin-top:8px;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:14px;color:var(--ink2)}
+.cmt b{color:var(--ink3);font-family:var(--mono);font-weight:400;font-size:12px;margin-right:8px}
 .empty{color:var(--ink3)}
 
-/* дела в списках */
-.task-row{display:flex;gap:14px;align-items:baseline;padding:10px 0;border-bottom:1px solid var(--line)}
-.task-row:last-child{border-bottom:none}
-.task-row .proj{color:var(--ink3);font-size:12px;letter-spacing:.06em;text-transform:uppercase;flex:0 0 104px}
-.task-row .t{flex:1}
-.badge{display:inline-block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;
-padding:2px 9px;border-radius:9px;border:1px solid var(--line);color:var(--ink3);white-space:nowrap;
-margin-left:10px;vertical-align:1px}
-.badge.done{color:var(--ok);border-color:color-mix(in srgb,var(--ok) 45%,transparent)}
-.badge.doing{color:var(--gold);border-color:color-mix(in srgb,var(--gold) 45%,transparent)}
+/* секвенсер */
+.seq{background:var(--panel);border:1px solid var(--line);border-radius:calc(var(--radius) + 4px);padding:16px;margin-top:12px}
+.seq-head{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+.seq-head button{font:inherit;background:transparent;border:1px solid var(--line);color:var(--ink);
+  padding:8px 14px;border-radius:10px;cursor:pointer}
+.seq-head button.play{border-color:var(--lime);color:var(--lime)}
+.seq-head button.play.on{background:var(--lime);color:var(--bg)}
+.seq-head button.stop:hover{border-color:var(--red);color:var(--red)}
+.bpm{display:flex;gap:6px;align-items:center;color:var(--ink3);font-size:13px}
+.bpm input,.bpm select{width:70px;font:inherit;background:var(--bg);border:1px solid var(--line);color:var(--ink);
+  padding:7px 10px;border-radius:8px;text-align:center;font-family:var(--mono)}
+.bpm select{width:auto}
+.stepinfo{margin-left:auto;font-family:var(--mono);color:var(--ink3);font-size:13px}
+.rows{display:grid;gap:10px}
+.row{display:grid;grid-template-columns:220px 1fr;gap:12px;align-items:center}
+.row-head{display:flex;gap:8px;align-items:center}
+.row-head select{font:inherit;font-size:13px;background:var(--bg);border:1px solid var(--line);color:var(--ink);
+  padding:5px 8px;border-radius:8px;max-width:110px}
+.swatches{display:flex;gap:5px}
+.swatch{width:16px;height:16px;border-radius:5px;border:2px solid transparent;cursor:pointer;flex:none}
+.swatch.on{border-color:var(--ink)}
+.steps{display:grid;grid-template-columns:repeat(16,1fr);gap:6px}
+.pad{aspect-ratio:1;border-radius:7px;background:var(--panel2);border:1px solid var(--line);cursor:pointer;transition:.1s}
+.pad:hover{transform:scale(1.07)}
+.pad.on{border-color:transparent;box-shadow:0 0 12px currentColor;background:currentColor}
+.pad.playhead{outline:2px solid var(--ink);outline-offset:1px;transform:scale(1.1)}
+.pads-note{color:var(--ink3);font-size:12px;margin-top:12px}
+@media(max-width:720px){.row{grid-template-columns:1fr}}
 </style>
 </head><body><div class="wrap">
 
 <div class="date">2026-11-05</div>
 <h1>Текущий обзор</h1>
-<p class="lead">Что в работе, что закрыто и как шёл день. Страница собирается автоматически.</p>
+
+<div class="console">
+  <div class="clock">
+    <div class="t" id="clock">--:--:--</div>
+    <div class="d" id="date">—</div>
+  </div>
+  <div class="day" data-start="600" data-end="1530">
+    <div class="title"><b id="dayline">—</b><span id="pct">—</span></div>
+    <div class="track"><div class="fill" id="fill"></div><div class="mark" id="mark"></div></div>
+    <div class="legend">
+      <span>предстоит <b id="cTodo">0</b></span>
+      <span>в деле <b id="cDoing">0</b></span>
+      <span>важно <b id="cImp">0</b></span>
+      <span>закрыто <b id="cDone">0</b></span>
+      <span>записей <b id="cNotes">2</b></span>
+    </div>
+  </div>
+</div>
 
 <div class="search">
-  <input id="q" type="search" placeholder="Поиск по всему обзору" autocomplete="off">
+  <input id="q" type="search" placeholder="Поиск по делам и записям" autocomplete="off">
   <div class="hint" id="qhint"></div>
 </div>
-<details class="section" id="work" open data-search="В работе"><summary><span class="chev">›</span><h2>В работе</h2></summary><div class="card"><p class="empty">Публичных дел сейчас нет.</p></div></details><details class="section" id="journal" open data-search="Дневник"><summary><span class="chev">›</span><h2>Дневник</h2></summary>
-<details class="entry" data-search="13:18 не очень удобно что чтобы сделать &quot;Публично&quot;, надо жать &quot;Скрыто&quot;. Я бы хотел тумблер как в Mac os">
-  <summary><span class="time">13:18</span>
-    <span class="peek">не очень удобно что чтобы сделать &quot;Публично&quot;, надо жать &quot;Скрыто&quot;. Я бы хотел тумблер как в</span><span class="chev">›</span></summary>
-  <div class="entry-body">не очень удобно что чтобы сделать &quot;Публично&quot;, надо жать &quot;Скрыто&quot;. Я бы хотел тумблер как в Mac os</div>
-</details>
-<details class="entry" data-search="13:24 нравится бумажная тема">
-  <summary><span class="time">13:24</span>
-    <span class="peek">нравится бумажная тема</span><span class="chev">›</span></summary>
-  <div class="entry-body">нравится бумажная тема</div>
-</details></details><details class="section" id="done" open data-search="Закрыто"><summary><span class="chev">›</span><h2>Закрыто</h2></summary><div class="card"><p class="empty">Пока пусто.</p></div></details><details class="section" id="reports" open data-search="Отчёты по дням"><summary><span class="chev">›</span><h2>Отчёты по дням</h2></summary><a href="r/2026-11-05.html">2026-11-05</a></details>
-<p class="meta">Собрано 05.11.2026 14:25. Здесь только то, что отмечено как публичное.</p>
+<div id="sections">
+<details class="section" id="work" open data-search="В работе"><summary><span class="chev">›</span><span class="led orange"></span><h2>В работе</h2><span class="sec-tools"><button class="mvjs" data-dir="-1" title="выше">↑</button><button class="mvjs" data-dir="1" title="ниже">↓</button></span></summary><div class="tasks"><p class="empty">Публичных дел сейчас нет.</p></div></details><details class="section" id="journal" open data-search="Дневник"><summary><span class="chev">›</span><span class="led blue"></span><h2>Дневник</h2><span class="sec-tools"><button class="mvjs" data-dir="-1" title="выше">↑</button><button class="mvjs" data-dir="1" title="ниже">↓</button></span></summary><div class="timeline">
+<div class="tentry " data-search="13:24 нравится бумажная тема">
+  <div class="head"><span class="time">13:24</span><span class="peek">нравится бумажная тема</span></div>
+  <div class="body"><div>нравится бумажная тема</div></div>
+</div>
+<div class="tentry " data-search="13:18 не очень удобно что чтобы сделать &quot;Публично&quot;, надо жать &quot;Скрыто&quot;. Я бы хотел тумблер как в Mac os">
+  <div class="head"><span class="time">13:18</span><span class="peek">не очень удобно что чтобы сделать &quot;Публично&quot;, надо жать &quot;Скрыто&quot;. Я бы хотел тумблер как в</span></div>
+  <div class="body"><div>не очень удобно что чтобы сделать &quot;Публично&quot;, надо жать &quot;Скрыто&quot;. Я бы хотел тумблер как в Mac os</div></div>
+</div></div></details><details class="section" id="done" open data-search="Закрыто"><summary><span class="chev">›</span><span class="led blue"></span><h2>Закрыто</h2><span class="sec-tools"><button class="mvjs" data-dir="-1" title="выше">↑</button><button class="mvjs" data-dir="1" title="ниже">↓</button></span></summary><div class="tasks"><p class="empty">Пока пусто.</p></div></details><details class="section" id="reports" open data-search="Отчёты по дням"><summary><span class="chev">›</span><span class="led blue"></span><h2>Отчёты по дням</h2><span class="sec-tools"><button class="mvjs" data-dir="-1" title="выше">↑</button><button class="mvjs" data-dir="1" title="ниже">↓</button></span></summary><a href="r/2026-11-05.html">2026-11-05</a></details><details class="section" id="seq" open data-search="Секвенсер"><summary><span class="chev">›</span><span class="led red"></span><h2>Секвенсер</h2><span class="sec-tools"><button class="mvjs" data-dir="-1" title="выше">↑</button><button class="mvjs" data-dir="1" title="ниже">↓</button></span></summary>
+<div class="seq">
+  <div class="seq-head">
+    <button class="play" id="play">▶ Играть</button>
+    <button class="stop" id="stop">■ Стоп</button>
+    <div class="bpm">темп <input id="bpm" type="number" min="60" max="180" value="96"> уд/мин</div>
+    <div class="bpm">длина
+      <select id="bars">
+        <option value="1">1 такт</option>
+        <option value="2">2 такта</option>
+        <option value="4" selected>4 такта</option>
+      </select>
+    </div>
+    <button class="exp" id="expmidi">MIDI ↓</button>
+    <button class="exp" id="expwav">WAV ↓</button>
+    <div class="stepinfo" id="stepinfo">шаг 0 / 16</div>
+  </div>
+  <div class="rows" id="rows"></div>
+  <div class="pads-note">столбец — шаг, строка — инструмент. Звук и цвет меняются прямо здесь, всё звучит и экспортируется.</div>
+</div></details>
+</div>
+<p class="meta">Собрано 05.11.2026 15:12. Здесь только то, что отмечено как публичное.</p>
 
 </div>
 <script>
 (function(){
-  // сворачиваемые блоки: состояние запоминается в браузере
-  [].slice.call(document.querySelectorAll('details.section')).forEach(function(d){
-    var key = 'fold:' + (d.id || 'x');
-    var saved = localStorage.getItem(key);
-    if (saved === '0') d.open = false;
-    d.addEventListener('toggle', function(){ localStorage.setItem(key, d.open ? '1' : '0'); });
+  document.querySelectorAll('details.section').forEach(function(d){
+    var k='fold:'+(d.id||'x'), v=localStorage.getItem(k);
+    if(v==='0') d.open=false;
+    d.addEventListener('toggle',function(){localStorage.setItem(k,d.open?'1':'0')});
   });
 
-  var box = document.getElementById('q');
-  if (!box) return;
-  var items = [].slice.call(document.querySelectorAll('[data-search]'));
-  var hint = document.getElementById('qhint');
-  box.addEventListener('input', function(){
-    var q = box.value.trim().toLowerCase();
-    var shown = 0;
-    items.forEach(function(el){
-      var hit = !q || (el.getAttribute('data-search') || '').toLowerCase().indexOf(q) > -1;
-      el.style.display = hit ? '' : 'none';
-      if (hit) shown++;
+  var h=document.getElementById('sections');
+  if(h){
+    var order=JSON.parse(localStorage.getItem('secorder')||'null');
+    if(order){ order.forEach(function(id){ var el=document.getElementById(id); if(el) h.appendChild(el); }); }
+  }
+  document.querySelectorAll('.mvjs').forEach(function(btn){
+    btn.addEventListener('click', function(e){
+      e.stopPropagation();
+      var sec=btn.closest('details.section');
+      if(!h||!sec) return;
+      var dir=+btn.dataset.dir;
+      var sib=dir<0?sec.previousElementSibling:sec.nextElementSibling;
+      if(!sib) return;
+      if(dir<0) h.insertBefore(sec,sib); else h.insertBefore(sib,sec);
+      var order=[].map.call(h.querySelectorAll('details.section'),function(x){return x.id});
+      localStorage.setItem('secorder',JSON.stringify(order));
     });
-    [].slice.call(document.querySelectorAll('details.section')).forEach(function(sec){
-      var any = [].slice.call(sec.querySelectorAll('[data-search]')).some(function(el){
-        return el.style.display !== 'none';
+  });
+
+  var day=document.querySelector('.day');
+  if(day){
+    var start=+day.dataset.start||600, end=+day.dataset.end||1530;
+    var fill=document.getElementById('fill'), mark=document.getElementById('mark'),
+        pct=document.getElementById('pct'), line=document.getElementById('dayline'),
+        clock=document.getElementById('clock'), date=document.getElementById('date');
+    var pad=function(x){return String(x).padStart(2,'0')};
+    function tick(){
+      var n=new Date();
+      if(clock) clock.textContent=pad(n.getHours())+':'+pad(n.getMinutes())+':'+pad(n.getSeconds());
+      if(date) date.textContent=n.toLocaleDateString('ru-RU',{weekday:'short',day:'numeric',month:'long'});
+      var now=n.getHours()*60+n.getMinutes()+n.getSeconds()/60;
+      if(now>=start&&now<=end){
+        var p=(now-start)/(end-start)*100;
+        if(fill) fill.style.width=p+'%';
+        if(mark) mark.style.left=p+'%';
+        if(pct) pct.textContent=Math.round(p)+'% дня';
+        if(line) line.textContent=p<30?'День только разворачивается':p<70?'День в разгаре':'Вечер — сводим итоги';
+        day.classList.remove('night');
+      } else {
+        if(fill) fill.style.width='0%';
+        if(mark) mark.style.left='0%';
+        if(pct) pct.textContent='ночь';
+        if(line) line.textContent='Ночь — пауза до '+pad(Math.floor(start/60))+':'+pad(start%60);
+        day.classList.add('night');
+      }
+    }
+    tick(); setInterval(tick,1000);
+  }
+
+  var box=document.getElementById('q');
+  if(box){
+    var hint=document.getElementById('qhint'), base=hint?hint.textContent:'';
+    box.addEventListener('input',function(){
+      var q=box.value.trim().toLowerCase(),shown=0;
+      document.querySelectorAll('[data-search]').forEach(function(el){
+        var hit=!q||(el.getAttribute('data-search')||'').toLowerCase().indexOf(q)>-1;
+        el.classList.toggle('hidden',!hit);
+        if(hit&&!el.classList.contains('section'))shown++;
       });
-      sec.style.display = any ? '' : 'none';
-      if (q && any) sec.open = true;
+      document.querySelectorAll('details.section').forEach(function(sec){
+        var any=[].slice.call(sec.querySelectorAll('[data-search]')).some(function(el){return !el.classList.contains('hidden');});
+        sec.classList.toggle('hidden',!any&&q);
+        if(q&&any)sec.open=true;
+      });
+      if(hint)hint.textContent=q?('найдено: '+shown):base;
     });
-    if (hint) hint.textContent = q ? ('найдено: ' + shown) : '';
+  }
+})();
+</script>
+<script>
+(function(){
+  if (!document.getElementById('rows')) return;
+
+  var COLORS = { red:"#ff3b4e", blue:"#3d8bff", lime:"#a8e05f", amber:"#ffb86b", cyan:"#4fd1d8", violet:"#b18cff" };
+  var PENTA = [45, 48, 50, 52, 55, 57, 60, 62, 64, 67];
+  var NOTE_NAMES = ["A2","C3","D3","E3","G3","A3","C4","D4","E4","G4"];
+  function freqOf(midi){ return 440 * Math.pow(2, (midi - 69) / 12); }
+
+  var INST = {
+    kick:  { name:"Кик", play: function(ac,t){ var o=ac.createOscillator(),g=ac.createGain(); o.type='sine';
+      o.frequency.setValueAtTime(160,t); o.frequency.exponentialRampToValueAtTime(45,t+0.12);
+      g.gain.setValueAtTime(0.9,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.28);
+      o.connect(g).connect(ac.destination); o.start(t); o.stop(t+0.3); } },
+    snare: { name:"Снейр", play: function(ac,t){ var b=ac.createBuffer(1,ac.sampleRate*0.2,ac.sampleRate),d=b.getChannelData(0);
+      for(var i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,2);
+      var s=ac.createBufferSource(),f=ac.createBiquadFilter(),g=ac.createGain();
+      f.type='bandpass'; f.frequency.value=1800; g.gain.value=0.7;
+      s.buffer=b; s.connect(f).connect(g).connect(ac.destination); s.start(t);
+      var o=ac.createOscillator(),g2=ac.createGain(); o.type='triangle'; o.frequency.value=190;
+      g2.gain.setValueAtTime(0.25,t); g2.gain.exponentialRampToValueAtTime(0.001,t+0.1);
+      o.connect(g2).connect(ac.destination); o.start(t); o.stop(t+0.11); } },
+    hat:   { name:"Хэт", play: function(ac,t){ var b=ac.createBuffer(1,ac.sampleRate*0.05,ac.sampleRate),d=b.getChannelData(0);
+      for(var i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,3);
+      var s=ac.createBufferSource(),f=ac.createBiquadFilter(),g=ac.createGain();
+      f.type='highpass'; f.frequency.value=8000; g.gain.value=0.35;
+      s.buffer=b; s.connect(f).connect(g).connect(ac.destination); s.start(t); } },
+    clap:  { name:"Хлоп", play: function(ac,t){ var b=ac.createBuffer(1,ac.sampleRate*0.12,ac.sampleRate),d=b.getChannelData(0);
+      for(var i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,1.5);
+      var s=ac.createBufferSource(),f=ac.createBiquadFilter(),g=ac.createGain();
+      f.type='bandpass'; f.frequency.value=1300; g.gain.value=0.55;
+      s.buffer=b; s.connect(f).connect(g).connect(ac.destination); s.start(t); } },
+    tom:   { name:"Том", play: function(ac,t){ var o=ac.createOscillator(),g=ac.createGain(); o.type='sine';
+      o.frequency.setValueAtTime(220,t); o.frequency.exponentialRampToValueAtTime(110,t+0.18);
+      g.gain.setValueAtTime(0.55,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.22);
+      o.connect(g).connect(ac.destination); o.start(t); o.stop(t+0.24); } },
+    bass:  { name:"Бас", play: function(ac,t,freq){ var o=ac.createOscillator(),f=ac.createBiquadFilter(),g=ac.createGain();
+      o.type='sawtooth'; o.frequency.value = freq || 55; f.type='lowpass'; f.frequency.value = Math.min(1200, (freq||55) * 6 + 200);
+      g.gain.setValueAtTime(0.55,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.26);
+      o.connect(f).connect(g).connect(ac.destination); o.start(t); o.stop(t+0.28); } },
+    blip:  { name:"Блип", play: function(ac,t){ var o=ac.createOscillator(),g=ac.createGain(); o.type='square'; o.frequency.value=880;
+      g.gain.setValueAtTime(0.25,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.07);
+      o.connect(g).connect(ac.destination); o.start(t); o.stop(t+0.08); } },
+  };
+
+  var saved = null;
+  try { saved = JSON.parse(localStorage.getItem('seq') || 'null'); } catch(e){}
+  var rows = saved || [
+    { inst:'kick',  color:'red',    steps:[1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0] },
+    { inst:'hat',   color:'amber',  steps:[0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,1] },
+    { inst:'snare', color:'blue',   steps:[0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0] },
+    { inst:'bass',  color:'violet', steps:[0,0,0,0, 0,0,1,0, 0,0,0,0, 0,0,1,0] },
+  ];
+
+  var AC = null;
+  function audio(){ return AC || (AC = new (window.AudioContext||window.webkitAudioContext)()); }
+
+  var rowsEl = document.getElementById('rows');
+  rows.forEach(function(r){
+    var rowEl = document.createElement('div'); rowEl.className = 'row';
+    var head = document.createElement('div'); head.className = 'row-head';
+    var sel = document.createElement('select');
+    Object.keys(INST).forEach(function(k){
+      var o = document.createElement('option'); o.value = k; o.textContent = INST[k].name;
+      if (k === r.inst) o.selected = true; sel.appendChild(o);
+    });
+    sel.addEventListener('change', function(){
+      r.inst = sel.value;
+      if (r.inst !== 'bass') { r.steps = r.steps.map(function(x){ return x ? 1 : 0; }); }
+      r.refreshPads.forEach(function(fn){ fn(); });
+      save();
+    });
+    head.appendChild(sel);
+    var sw = document.createElement('div'); sw.className = 'swatches';
+    Object.keys(COLORS).forEach(function(name){
+      var hex = COLORS[name];
+      var s = document.createElement('div'); s.className = 'swatch' + (r.color===name?' on':'');
+      s.style.background = hex; s.title = name;
+      s.addEventListener('click', function(){
+        r.color = name;
+        sw.querySelectorAll('.swatch').forEach(function(x){x.classList.remove('on')});
+        s.classList.add('on');
+        rowEl.querySelectorAll('.pad').forEach(function(p){ p.style.color = hex; });
+        save();
+      });
+      sw.appendChild(s);
+    });
+    head.appendChild(sw);
+    rowEl.appendChild(head);
+    var stepsEl = document.createElement('div'); stepsEl.className = 'steps';
+    r.padEls = [];
+    r.refreshPads = [];
+    for (var i = 0; i < 16; i++) { (function(i){
+      var p = document.createElement('div');
+      p.className = 'pad';
+      p.style.color = COLORS[r.color];
+      function refresh(){
+        var on = !!r.steps[i];
+        p.classList.toggle('on', on);
+        var pitched = on && r.inst === 'bass';
+        p.textContent = pitched ? NOTE_NAMES[r.steps[i]-1] : '';
+        p.style.fontSize = pitched ? '9px' : '';
+        p.style.display = 'grid';
+        p.style.placeItems = 'center';
+        p.style.filter = pitched ? 'brightness(' + (1 + (r.steps[i]-1) * 0.08) + ')' : '';
+      }
+      p.addEventListener('click', function(){
+        if (r.inst === 'bass') {
+          if (!r.steps[i]) r.steps[i] = 1;
+          else if (r.steps[i] >= PENTA.length) r.steps[i] = 0;
+          else r.steps[i] += 1;
+        } else {
+          r.steps[i] = r.steps[i] ? 0 : 1;
+        }
+        refresh();
+        if (r.steps[i]) {
+          var f = (r.inst === 'bass') ? freqOf(PENTA[r.steps[i]-1]) : undefined;
+          INST[r.inst].play(audio(), audio().currentTime, f);
+        }
+        save();
+      });
+      stepsEl.appendChild(p);
+      r.padEls.push(p);
+      r.refreshPads.push(refresh);
+      refresh();
+    })(i); }
+    rowEl.appendChild(stepsEl);
+    rowsEl.appendChild(rowEl);
+  });
+  function save(){ localStorage.setItem('seq', JSON.stringify(rows.map(function(r){return {inst:r.inst,color:r.color,steps:r.steps}}))); }
+
+  var playing = false, step = 0, timer = null;
+  function currentBpm(){ return Math.min(180, Math.max(60, +document.getElementById('bpm').value || 96)); }
+  function tickSeq(){
+    rows.forEach(function(r){ r.padEls.forEach(function(p,i){ p.classList.toggle('playhead', i===step); }); });
+    document.getElementById('stepinfo').textContent = 'шаг ' + (step+1) + ' / 16';
+    rows.forEach(function(r){
+      if (r.steps[step]) {
+        var f = (r.inst === 'bass') ? freqOf(PENTA[r.steps[step]-1]) : undefined;
+        INST[r.inst].play(audio(), audio().currentTime, f);
+      }
+    });
+    step = (step + 1) % 16;
+  }
+  document.getElementById('play').addEventListener('click', function(){
+    if (playing) return;
+    audio().resume();
+    playing = true; step = 0;
+    this.classList.add('on'); this.textContent = '▶ Идёт';
+    tickSeq();
+    timer = setInterval(tickSeq, 60000 / currentBpm() / 4);
+  });
+  document.getElementById('stop').addEventListener('click', function(){
+    playing = false; clearInterval(timer);
+    var pl = document.getElementById('play');
+    pl.classList.remove('on'); pl.textContent = '▶ Играть';
+    document.getElementById('stepinfo').textContent = 'шаг 0 / 16';
+    rows.forEach(function(r){ r.padEls.forEach(function(p){ p.classList.remove('playhead'); }); });
+  });
+  document.getElementById('bpm').addEventListener('change', function(){
+    if (playing) { clearInterval(timer); timer = setInterval(tickSeq, 60000 / currentBpm() / 4); }
+  });
+
+  function download(blob, name){
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = name; a.click();
+    setTimeout(function(){ URL.revokeObjectURL(a.href); }, 4000);
+  }
+  function vlq(n){
+    var out = [n & 0x7F]; n >>= 7;
+    while (n > 0) { out.unshift(0x80 | (n & 0x7F)); n >>= 7; }
+    return out;
+  }
+  function midiFile(bars){
+    var bpm = currentBpm();
+    var tpq = 480, six = 120;
+    var NOTE = { kick:36, snare:38, hat:42, clap:39, tom:45, bass:33, blip:80 };
+    var usec = Math.round(60000000 / bpm);
+    var events = [];
+    rows.forEach(function(r){
+      for (var bar = 0; bar < bars; bar++) {
+        r.steps.forEach(function(on, i){
+          if (!on) return;
+          var note = (r.inst === 'bass') ? PENTA[on - 1] : (NOTE[r.inst] || 36);
+          events.push([bar * 16 * six + i * six, note]);
+        });
+      }
+    });
+    events.sort(function(a,b){ return a[0]-b[0]; });
+    var track = [
+      0xFF, 0x51, 0x03, (usec >> 16) & 255, (usec >> 8) & 255, usec & 255,
+      0xFF, 0x58, 0x04, 0x04, 0x02, 0x18, 0x08
+    ];
+    var prev = 0;
+    events.forEach(function(ev){
+      var t = ev[0], note = ev[1];
+      track = track.concat(vlq(t - prev), [0x99, note, 100], vlq(96), [0x89, note, 0]);
+      prev = t + 96;
+    });
+    track = track.concat([0x00, 0xFF, 0x2F, 0x00]);
+    var header = [0x4D,0x54,0x68,0x64, 0,0,0,6, 0,0, 0,1, (tpq>>8)&255, tpq&255];
+    var trackHead = [0x4D,0x54,0x72,0x6B,
+      (track.length>>24)&255, (track.length>>16)&255, (track.length>>8)&255, track.length&255];
+    return new Blob([new Uint8Array(header.concat(trackHead).concat(track))], { type: 'audio/midi' });
+  }
+  function wavFromBuffer(buffer, sampleRate){
+    var ch0 = buffer.getChannelData(0);
+    var ch1 = buffer.numberOfChannels > 1 ? buffer.getChannelData(1) : ch0;
+    var len = ch0.length, bytes = 44 + len * 4;
+    var ab = new ArrayBuffer(bytes), dv = new DataView(ab);
+    function ws(o, s){ for (var i = 0; i < s.length; i++) dv.setUint8(o + i, s.charCodeAt(i)); }
+    ws(0,'RIFF'); dv.setUint32(4, bytes-8, true); ws(8,'WAVE');
+    ws(12,'fmt '); dv.setUint32(16,16,true); dv.setUint16(20,1,true); dv.setUint16(22,2,true);
+    dv.setUint32(24,sampleRate,true); dv.setUint32(28,sampleRate*4,true);
+    dv.setUint16(32,4,true); dv.setUint16(34,16,true);
+    ws(36,'data'); dv.setUint32(40,len*4,true);
+    var o = 44;
+    for (var i = 0; i < len; i++) {
+      dv.setInt16(o, Math.max(-1, Math.min(1, ch0[i])) * 32767, true); o += 2;
+      dv.setInt16(o, Math.max(-1, Math.min(1, ch1[i])) * 32767, true); o += 2;
+    }
+    return new Blob([ab], { type: 'audio/wav' });
+  }
+  function renderWav(bars){
+    var bpm = currentBpm();
+    var stepDur = 60 / bpm / 4, total = stepDur * 16 * bars;
+    var sr = 44100;
+    var off = new OfflineAudioContext(2, Math.ceil(sr * (total + 0.5)), sr);
+    rows.forEach(function(r){
+      for (var bar = 0; bar < bars; bar++) {
+        r.steps.forEach(function(on, i){
+          if (!on) return;
+          var f = (r.inst === 'bass') ? freqOf(PENTA[on - 1]) : undefined;
+          INST[r.inst].play(off, bar * 16 * stepDur + i * stepDur, f);
+        });
+      }
+    });
+    off.startRendering().then(function(buf){
+      download(wavFromBuffer(buf, sr), 'sequence-' + bpm + 'bpm-' + bars + 'bar.wav');
+    });
+  }
+  document.getElementById('expmidi').addEventListener('click', function(){
+    var bars = +document.getElementById('bars').value;
+    download(midiFile(bars), 'sequence-' + currentBpm() + 'bpm-' + bars + 'bar.mid');
+  });
+  document.getElementById('expwav').addEventListener('click', function(){
+    renderWav(+document.getElementById('bars').value);
   });
 })();
 </script>
