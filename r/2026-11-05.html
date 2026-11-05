@@ -145,6 +145,13 @@ details.section > summary:hover .chev{color:var(--red)}
 .pad:hover{transform:scale(1.07)}
 .pad.on{border-color:transparent;box-shadow:0 0 12px currentColor;background:currentColor}
 .pad.playhead{outline:2px solid var(--ink);outline-offset:1px;transform:scale(1.1)}
+.patterns{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.ptab{font:inherit;font-size:13px;background:var(--panel2);border:1px solid var(--line);color:var(--ink2);
+  padding:6px 14px;border-radius:9px;cursor:pointer;font-family:var(--mono)}
+.ptab:hover{border-color:var(--orange);color:var(--orange)}
+.ptab.on{background:var(--accent);border-color:var(--accent);color:var(--bg)}
+.ptab.del{padding:6px 9px}
+.ptab.plus{border-style:dashed}
 .notepicker{position:fixed;z-index:50;display:none;background:var(--panel);border:1px solid var(--line);
 border-radius:var(--radius);padding:8px;grid-template-columns:repeat(5,1fr);gap:6px;
 box-shadow:0 12px 30px rgba(0,0,0,.45)}

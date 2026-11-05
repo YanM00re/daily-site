@@ -145,6 +145,13 @@ details.section > summary:hover .chev{color:var(--red)}
 .pad:hover{transform:scale(1.07)}
 .pad.on{border-color:transparent;box-shadow:0 0 12px currentColor;background:currentColor}
 .pad.playhead{outline:2px solid var(--ink);outline-offset:1px;transform:scale(1.1)}
+.patterns{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.ptab{font:inherit;font-size:13px;background:var(--panel2);border:1px solid var(--line);color:var(--ink2);
+  padding:6px 14px;border-radius:9px;cursor:pointer;font-family:var(--mono)}
+.ptab:hover{border-color:var(--orange);color:var(--orange)}
+.ptab.on{background:var(--accent);border-color:var(--accent);color:var(--bg)}
+.ptab.del{padding:6px 9px}
+.ptab.plus{border-style:dashed}
 .notepicker{position:fixed;z-index:50;display:none;background:var(--panel);border:1px solid var(--line);
 border-radius:var(--radius);padding:8px;grid-template-columns:repeat(5,1fr);gap:6px;
 box-shadow:0 12px 30px rgba(0,0,0,.45)}
@@ -193,19 +200,14 @@ padding:3px 7px;border-radius:7px;cursor:pointer}
   <div class="seq-head">
     <button class="play" id="play">▶ Играть</button>
     <button class="stop" id="stop">■ Стоп</button>
+    <button id="chainmode" title="петля одного паттерна или вся цепочка подряд">▶ петля A</button>
     <div class="bpm">темп <input id="bpm" type="number" min="60" max="180" value="96"> уд/мин</div>
-    <div class="bpm">длина
-      <select id="bars">
-        <option value="1">1 такт</option>
-        <option value="2">2 такта</option>
-        <option value="4" selected>4 такта</option>
-      </select>
-    </div>
     <button class="exp" id="expmidi">MIDI ↓</button>
     <button class="exp" id="expwav">WAV ↓</button>
     <button class="exp" id="addrow">＋ дорожка</button>
     <div class="stepinfo" id="stepinfo">шаг 0 / 16</div>
   </div>
+  <div class="patterns" id="patterns"></div>
   <div class="rows" id="rows"></div>
   <div class="pads-note">столбец — шаг, строка — инструмент. Звук и цвет меняются прямо здесь, всё звучит и экспортируется.</div>
 </div></details><details class="section" id="work" open data-search="В работе"><summary><span class="chev">›</span><span class="led orange"></span><h2>В работе</h2><span class="sec-tools"><button class="mvjs" data-dir="-1" title="выше">↑</button><button class="mvjs" data-dir="1" title="ниже">↓</button></span></summary><div class="tasks"><p class="empty">Публичных дел сейчас нет.</p></div></details><details class="section" id="journal" open data-search="Дневник"><summary><span class="chev">›</span><span class="led blue"></span><h2>Дневник</h2><span class="sec-tools"><button class="mvjs" data-dir="-1" title="выше">↑</button><button class="mvjs" data-dir="1" title="ниже">↓</button></span></summary><div class="timeline">
@@ -218,7 +220,7 @@ padding:3px 7px;border-radius:7px;cursor:pointer}
   <div class="body"><div>не очень удобно что чтобы сделать &quot;Публично&quot;, надо жать &quot;Скрыто&quot;. Я бы хотел тумблер как в Mac os</div></div>
 </div></div></details><details class="section" id="done" open data-search="Закрыто"><summary><span class="chev">›</span><span class="led blue"></span><h2>Закрыто</h2><span class="sec-tools"><button class="mvjs" data-dir="-1" title="выше">↑</button><button class="mvjs" data-dir="1" title="ниже">↓</button></span></summary><div class="tasks"><p class="empty">Пока пусто.</p></div></details><details class="section" id="reports" open data-search="Отчёты по дням"><summary><span class="chev">›</span><span class="led blue"></span><h2>Отчёты по дням</h2><span class="sec-tools"><button class="mvjs" data-dir="-1" title="выше">↑</button><button class="mvjs" data-dir="1" title="ниже">↓</button></span></summary><a href="r/2026-11-05.html">2026-11-05</a></details>
 </div>
-<p class="meta">Собрано 05.11.2026 15:33. Здесь только то, что отмечено как публичное.</p>
+<p class="meta">Собрано 05.11.2026 15:52. Здесь только то, что отмечено как публичное.</p>
 
 </div>
 <script>
@@ -376,16 +378,39 @@ padding:3px 7px;border-radius:7px;cursor:pointer}
 
   var samples = null;
   fetch('/samples.json').then(function(r){ return r.ok ? r.json() : null; })
-    .then(function(data){ samples = data; buildSelects(); }).catch(function(){ samples = null; });
+    .then(function(data){ samples = data; }).catch(function(){ samples = null; });
 
+  function defaultRows(){
+    return [
+      { inst:'kick',  color:'red',    pitched:false, steps:[1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0] },
+      { inst:'hat',   color:'amber',  pitched:false, steps:[0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,1] },
+      { inst:'snare', color:'blue',   pitched:false, steps:[0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0] },
+      { inst:'bass',  color:'violet', pitched:true,  steps:[0,0,0,0, 0,0,3,0, 0,0,0,0, 0,0,5,0] },
+    ];
+  }
+
+  // ── паттерны ────────────────────────────────────────────────────────────
   var saved = null;
   try { saved = JSON.parse(localStorage.getItem('seq') || 'null'); } catch(e){}
-  var rows = saved || [
-    { inst:'kick',  color:'red',    pitched:false, steps:[1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0] },
-    { inst:'hat',   color:'amber',  pitched:false, steps:[0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,1] },
-    { inst:'snare', color:'blue',   pitched:false, steps:[0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0] },
-    { inst:'bass',  color:'violet', pitched:true,  steps:[0,0,0,0, 0,0,3,0, 0,0,0,0, 0,0,5,0] },
-  ];
+  var patterns, active = 0, chain = false;
+  if (saved && saved.patterns) {
+    patterns = saved.patterns;
+    active = Math.min(saved.active || 0, patterns.length - 1);
+    chain = !!saved.chain;
+  } else if (Array.isArray(saved)) {
+    patterns = [{ name:'A', rows: saved }];
+  } else {
+    patterns = [{ name:'A', rows: defaultRows() }];
+  }
+  function rows(){ return patterns[active].rows; }
+  function patternName(i){ return String.fromCharCode(65 + i); }
+
+  function save(){
+    localStorage.setItem('seq', JSON.stringify({
+      patterns: patterns.map(function(p){ return { name:p.name, rows:p.rows }; }),
+      active: active, chain: chain,
+    }));
+  }
 
   var rowsEl = document.getElementById('rows');
   var picker = document.createElement('div'); picker.className = 'notepicker';
@@ -404,26 +429,6 @@ padding:3px 7px;border-radius:7px;cursor:pointer}
     return out;
   }
 
-  function buildSelects(){
-    document.querySelectorAll('.row select[data-inst]').forEach(function(sel){
-      var cur = sel.value;
-      sel.innerHTML = '';
-      var groups = {};
-      instOptions().forEach(function(o){
-        if (!groups[o.group]) { groups[o.group] = document.createElement('optgroup'); groups[o.group].label = o.group; sel.appendChild(groups[o.group]); }
-        var opt = document.createElement('option'); opt.value = o.value; opt.textContent = o.label;
-        groups[o.group].appendChild(opt);
-      });
-      sel.value = cur;
-    });
-  }
-
-  function save(){
-    localStorage.setItem('seq', JSON.stringify(rows.map(function(r){
-      return { inst:r.inst, color:r.color, pitched:!!r.pitched, steps:r.steps };
-    })));
-  }
-
   function refreshPad(r, i){
     var p = r.padEls[i], on = !!r.steps[i], pitched = on && r.pitched;
     p.classList.toggle('on', on);
@@ -434,9 +439,42 @@ padding:3px 7px;border-radius:7px;cursor:pointer}
     p.style.filter = pitched ? 'brightness(' + (1 + (r.steps[i]-1) * 0.08) + ')' : '';
   }
 
+  function renderPatterns(){
+    var bar = document.getElementById('patterns');
+    if (!bar) return;
+    bar.innerHTML = '';
+    patterns.forEach(function(p, i){
+      var tab = document.createElement('button');
+      tab.className = 'ptab' + (i === active ? ' on' : '');
+      tab.textContent = p.name || patternName(i);
+      tab.addEventListener('click', function(){ active = i; save(); renderAll(); });
+      bar.appendChild(tab);
+      if (patterns.length > 1) {
+        var x = document.createElement('button');
+        x.className = 'ptab del'; x.textContent = '×'; x.title = 'удалить паттерн';
+        x.addEventListener('click', function(e){
+          e.stopPropagation();
+          if (!confirm('Удалить паттерн ' + (p.name || patternName(i)) + '?')) return;
+          patterns.splice(i, 1);
+          if (active >= patterns.length) active = patterns.length - 1;
+          save(); renderAll();
+        });
+        bar.appendChild(x);
+      }
+    });
+    var plus = document.createElement('button');
+    plus.className = 'ptab plus'; plus.textContent = '＋'; plus.title = 'новый паттерн';
+    plus.addEventListener('click', function(){
+      patterns.push({ name: patternName(patterns.length), rows: defaultRows() });
+      active = patterns.length - 1;
+      save(); renderAll();
+    });
+    bar.appendChild(plus);
+  }
+
   function renderRows(){
     rowsEl.innerHTML = '';
-    rows.forEach(function(r, ri){
+    rows().forEach(function(r, ri){
       var rowEl = document.createElement('div'); rowEl.className = 'row';
 
       var head = document.createElement('div'); head.className = 'row-head';
@@ -490,16 +528,18 @@ padding:3px 7px;border-radius:7px;cursor:pointer}
 
       var up = document.createElement('button'); up.className = 'mini'; up.textContent = '↑'; up.title = 'выше';
       up.addEventListener('click', function(){
-        if (ri > 0) { rows.splice(ri, 1); rows.splice(ri - 1, 0, r); save(); renderRows(); }
+        var list = rows();
+        if (ri > 0) { list.splice(ri, 1); list.splice(ri - 1, 0, r); save(); renderRows(); }
       });
       var down = document.createElement('button'); down.className = 'mini'; down.textContent = '↓'; down.title = 'ниже';
       down.addEventListener('click', function(){
-        if (ri < rows.length - 1) { rows.splice(ri, 1); rows.splice(ri + 1, 0, r); save(); renderRows(); }
+        var list = rows();
+        if (ri < list.length - 1) { list.splice(ri, 1); list.splice(ri + 1, 0, r); save(); renderRows(); }
       });
       var del = document.createElement('button'); del.className = 'mini'; del.textContent = '×'; del.title = 'удалить дорожку';
       del.addEventListener('click', function(){
-        if (rows.length <= 1) return;
-        if (confirm('Удалить эту дорожку?')) { rows.splice(ri, 1); save(); renderRows(); }
+        if (rows().length <= 1) return;
+        if (confirm('Удалить эту дорожку?')) { rows().splice(ri, 1); save(); renderRows(); }
       });
       head.appendChild(up); head.appendChild(down); head.appendChild(del);
 
@@ -558,30 +598,47 @@ padding:3px 7px;border-radius:7px;cursor:pointer}
     picker.classList.add('open');
   }
 
-  renderRows();
+  function renderAll(){
+    renderPatterns();
+    renderRows();
+    var modeBtn = document.getElementById('chainmode');
+    if (modeBtn) modeBtn.textContent = chain ? '▶ вся цепочка' : '▶ петля ' + patternName(active);
+  }
+
+  renderAll();
 
   var addBtn = document.getElementById('addrow');
   if (addBtn) addBtn.addEventListener('click', function(){
-    rows.push({ inst:'kick', color:'cyan', pitched:false, steps:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] });
+    rows().push({ inst:'kick', color:'cyan', pitched:false, steps:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] });
     save(); renderRows();
   });
 
-  var playing = false, step = 0, timer = null;
+  var modeBtn = document.getElementById('chainmode');
+  if (modeBtn) modeBtn.addEventListener('click', function(){
+    chain = !chain; save(); renderAll();
+  });
+
+  var playing = false, step = 0, playPattern = 0, timer = null;
   function currentBpm(){ return Math.min(180, Math.max(60, +document.getElementById('bpm').value || 96)); }
   function tickSeq(){
-    rows.forEach(function(r){ r.padEls.forEach(function(p, i){ p.classList.toggle('playhead', i === step); }); });
-    document.getElementById('stepinfo').textContent = 'шаг ' + (step + 1) + ' / 16';
-    rows.forEach(function(r){
+    if (playPattern !== active) { active = playPattern; renderAll(); }
+    rows().forEach(function(r){ r.padEls.forEach(function(p, i){ p.classList.toggle('playhead', i === step); }); });
+    document.getElementById('stepinfo').textContent =
+      patternName(active) + ' · шаг ' + (step + 1) + ' / 16' + (chain ? ' · цепочка' : '');
+    rows().forEach(function(r){
       if (r.steps[step]) {
         playNow(r.inst, r.pitched ? freqOf(PENTA[r.steps[step]-1]) : undefined, audio().currentTime);
       }
     });
     step = (step + 1) % 16;
+    if (step === 0 && chain) {
+      playPattern = (playPattern + 1) % patterns.length;
+    }
   }
   document.getElementById('play').addEventListener('click', function(){
     if (playing) return;
     audio().resume();
-    playing = true; step = 0;
+    playing = true; step = 0; playPattern = active;
     this.classList.add('on'); this.textContent = '▶ Идёт';
     tickSeq();
     timer = setInterval(tickSeq, 60000 / currentBpm() / 4);
@@ -591,7 +648,7 @@ padding:3px 7px;border-radius:7px;cursor:pointer}
     var pl = document.getElementById('play');
     pl.classList.remove('on'); pl.textContent = '▶ Играть';
     document.getElementById('stepinfo').textContent = 'шаг 0 / 16';
-    rows.forEach(function(r){ r.padEls.forEach(function(p){ p.classList.remove('playhead'); }); });
+    patterns[active].rows.forEach(function(r){ r.padEls.forEach(function(p){ p.classList.remove('playhead'); }); });
   });
   document.getElementById('bpm').addEventListener('change', function(){
     if (playing) { clearInterval(timer); timer = setInterval(tickSeq, 60000 / currentBpm() / 4); }
@@ -607,20 +664,20 @@ padding:3px 7px;border-radius:7px;cursor:pointer}
     while (n > 0) { out.unshift(0x80 | (n & 0x7F)); n >>= 7; }
     return out;
   }
-  function midiFile(bars){
+  function midiFile(){
     var bpm = currentBpm();
     var tpq = 480, six = 120;
     var NOTE = { kick:36, snare:38, hat:42, clap:39, tom:45, bass:33, blip:80 };
     var usec = Math.round(60000000 / bpm);
     var events = [];
-    rows.forEach(function(r){
-      for (var bar = 0; bar < bars; bar++) {
+    patterns.forEach(function(p, pi){
+      p.rows.forEach(function(r){
         r.steps.forEach(function(on, i){
           if (!on) return;
           var note = r.pitched ? PENTA[on - 1] : (isSample(r.inst) ? 36 : (NOTE[r.inst] || 36));
-          events.push([bar * 16 * six + i * six, note]);
+          events.push([pi * 16 * six + i * six, note]);
         });
-      }
+      });
     });
     events.sort(function(a,b){ return a[0]-b[0]; });
     var track = [
@@ -657,24 +714,26 @@ padding:3px 7px;border-radius:7px;cursor:pointer}
     }
     return new Blob([ab], { type: 'audio/wav' });
   }
-  function renderWav(bars){
+  function renderWav(){
     var bpm = currentBpm();
-    var stepDur = 60 / bpm / 4, total = stepDur * 16 * bars;
+    var stepDur = 60 / bpm / 4, total = stepDur * 16 * patterns.length;
     var sr = 44100;
     audio();
     var loads = [];
-    rows.forEach(function(r){
-      if (isSample(r.inst)) loads.push(loadBuffer(sampleUrl(r.inst)).catch(function(){ return null; }));
+    patterns.forEach(function(p){
+      p.rows.forEach(function(r){
+        if (isSample(r.inst)) loads.push(loadBuffer(sampleUrl(r.inst)).catch(function(){ return null; }));
+      });
     });
     Promise.all(loads).then(function(){
       var off = new OfflineAudioContext(2, Math.ceil(sr * (total + 0.5)), sr);
       var jobs = [];
-      rows.forEach(function(r){
-        for (var bar = 0; bar < bars; bar++) {
+      patterns.forEach(function(p, pi){
+        p.rows.forEach(function(r){
           r.steps.forEach(function(on, i){
             if (!on) return;
             var f = r.pitched ? freqOf(PENTA[on - 1]) : undefined;
-            var t = bar * 16 * stepDur + i * stepDur;
+            var t = pi * 16 * stepDur + i * stepDur;
             if (isSample(r.inst)) {
               jobs.push(buffers[sampleUrl(r.inst)].then(function(buf){
                 if (!buf) return;
@@ -688,21 +747,20 @@ padding:3px 7px;border-radius:7px;cursor:pointer}
               SYNTH[r.inst].play(off, t, f);
             }
           });
-        }
+        });
       });
       Promise.all(jobs).then(function(){
         off.startRendering().then(function(buf){
-          download(wavFromBuffer(buf, sr), 'sequence-' + bpm + 'bpm-' + bars + 'bar.wav');
+          download(wavFromBuffer(buf, sr), 'sequence-' + bpm + 'bpm-' + patterns.length + 'pat.wav');
         });
       });
     });
   }
   document.getElementById('expmidi').addEventListener('click', function(){
-    var bars = +document.getElementById('bars').value;
-    download(midiFile(bars), 'sequence-' + currentBpm() + 'bpm-' + bars + 'bar.mid');
+    download(midiFile(), 'sequence-' + currentBpm() + 'bpm-' + patterns.length + 'pat.mid');
   });
   document.getElementById('expwav').addEventListener('click', function(){
-    renderWav(+document.getElementById('bars').value);
+    renderWav();
   });
 })();
 </script>
