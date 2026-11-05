@@ -8,6 +8,7 @@
   --bg:#f2f2f7; --panel:#ffffff; --ink:#1c1c1e; --ink2:#3c3c43;
   --ink3:#8e8e93; --line:#e3e3e8; --accent:#0a84ff; --ok:#34c759;
   --gold:#ff9f0a; --radius:12px; --body:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",sans-serif; --head:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",sans-serif;
+  --mono:ui-monospace,"SF Mono",Menlo,monospace;
 }
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;
@@ -33,10 +34,17 @@ color:var(--ink);padding:11px 14px;border-radius:calc(var(--radius) + 2px);outli
 .search input:focus{border-color:var(--accent)}
 .search .hint{color:var(--ink3);font-size:12px;margin-top:6px}
 
-/* блоки-секции */
-.section{margin:26px 0}
-.section-head{display:flex;align-items:center;gap:8px}
-.section-head h2{margin:0;flex:1}
+/* блоки-секции: сворачиваются, как в Обсидиане */
+details.section{margin:22px 0}
+details.section > summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px;
+margin:0 0 10px;user-select:none}
+details.section > summary::-webkit-details-marker{display:none}
+details.section > summary h2{margin:0;flex:1}
+details.section > summary .chev{color:var(--ink3);font-size:13px;transition:transform .15s;display:inline-block}
+details.section[open] > summary .chev{transform:rotate(90deg)}
+details.section > summary:hover .chev{color:var(--accent)}
+.section-tools{display:flex;gap:6px;align-items:center}
+.section-tools form{margin:0}
 
 /* записи дневника */
 details.entry{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
@@ -120,6 +128,14 @@ margin-left:10px;vertical-align:1px}
 </div>
 <script>
 (function(){
+  // сворачиваемые блоки: состояние запоминается в браузере
+  [].slice.call(document.querySelectorAll('details.section')).forEach(function(d){
+    var key = 'fold:' + (d.id || 'x');
+    var saved = localStorage.getItem(key);
+    if (saved === '0') d.open = false;
+    d.addEventListener('toggle', function(){ localStorage.setItem(key, d.open ? '1' : '0'); });
+  });
+
   var box = document.getElementById('q');
   if (!box) return;
   var items = [].slice.call(document.querySelectorAll('[data-search]'));
@@ -132,11 +148,12 @@ margin-left:10px;vertical-align:1px}
       el.style.display = hit ? '' : 'none';
       if (hit) shown++;
     });
-    document.querySelectorAll('.section').forEach(function(sec){
+    [].slice.call(document.querySelectorAll('details.section')).forEach(function(sec){
       var any = [].slice.call(sec.querySelectorAll('[data-search]')).some(function(el){
         return el.style.display !== 'none';
       });
       sec.style.display = any ? '' : 'none';
+      if (q && any) sec.open = true;
     });
     if (hint) hint.textContent = q ? ('найдено: ' + shown) : '';
   });
