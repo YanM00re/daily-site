@@ -5,39 +5,42 @@
 <title>Отчёт 2026-11-05</title>
 <style>
 :root{
-  --bg:#1c1914; --bg2:#25211a; --ink:#ece4d2; --ink2:#bdb29d; --ink3:#8b826f;
-  --line:#352f25; --accent:#dd7a63; --gold:#d8a650; --green:#86b46a;
-  --serif:"Iowan Old Style","Palatino Linotype",Georgia,serif;
+  --bg:#fdf6ec; --panel:#fffaf3; --ink:#2f2a24; --ink2:#5c5347;
+  --ink3:#8d8272; --line:#ecdfcd; --accent:#d2603a; --ok:#4c7a45;
+  --gold:#c98a2b; --radius:10px; --body:"Iowan Old Style","Palatino Linotype",Georgia,serif; --head:"Iowan Old Style","Palatino Linotype",Georgia,serif;
 }
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--serif);font-size:17px;line-height:1.6}
-.wrap{max-width:820px;margin:0 auto;padding:48px 24px 96px}
-a{color:var(--gold);text-decoration:none;border-bottom:1px solid rgba(216,166,80,.35)}
-a:hover{border-bottom-color:var(--gold)}
-h1{font-size:34px;line-height:1.15;margin:0 0 6px;letter-spacing:.01em}
-h2{font-size:22px;margin:38px 0 12px;color:var(--ink)}
-h3{font-size:18px;margin:24px 0 8px;color:var(--ink2)}
-.date{color:var(--ink3);font-size:15px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:18px}
-.lead{color:var(--ink2);margin:0 0 28px}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.6;
+-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:44px 22px 90px}
+h1{font-family:var(--head);font-size:34px;line-height:1.15;margin:0 0 6px;letter-spacing:.01em}
+h2{font-family:var(--head);font-size:22px;margin:36px 0 12px}
+h3{font-family:var(--head);font-size:18px;margin:24px 0 8px}
+a{color:var(--accent);text-decoration:none;border-bottom:1px solid color-mix(in srgb, var(--accent) 35%, transparent)}
+a:hover{border-bottom-color:var(--accent)}
+.date{color:var(--ink3);font-size:14px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:16px}
+.lead{color:var(--ink2);margin:0 0 26px}
 ul{padding-left:22px;margin:10px 0}
 li{margin:6px 0}
-code{background:var(--bg2);padding:1px 6px;border-radius:4px;font-size:15px;color:var(--gold)}
-.rule{height:1px;background:var(--line);margin:34px 0}
-.meta{color:var(--ink3);font-size:14px;margin-top:52px;border-top:1px solid var(--line);padding-top:16px}
-.badge{display:inline-block;font-size:12px;letter-spacing:.06em;text-transform:uppercase;
-  padding:2px 8px;border-radius:10px;border:1px solid var(--line);color:var(--ink3);margin-left:8px}
-.badge.done{color:var(--green);border-color:rgba(134,180,106,.4)}
-.badge.doing{color:var(--gold);border-color:rgba(216,166,80,.4)}
-.task{display:flex;gap:10px;align-items:baseline;padding:7px 0;border-bottom:1px solid var(--line)}
-.task .proj{color:var(--ink3);font-size:13px;letter-spacing:.04em;text-transform:uppercase;min-width:110px}
+code{background:var(--panel);padding:1px 6px;border-radius:5px;font-size:15px}
+.rule{height:1px;background:var(--line);margin:32px 0}
+.meta{color:var(--ink3);font-size:14px;margin-top:48px;border-top:1px solid var(--line);padding-top:16px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:calc(var(--radius) + 4px);padding:6px 18px;margin:14px 0}
+.task{display:flex;gap:12px;align-items:baseline;padding:10px 0;border-bottom:1px solid var(--line)}
+.task:last-child{border-bottom:none}
+.task .proj{color:var(--ink3);font-size:12px;letter-spacing:.06em;text-transform:uppercase;min-width:104px}
 .task .t{flex:1}
-</style></head>
-<body><div class="wrap">
+.badge{display:inline-block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;
+padding:2px 8px;border-radius:9px;border:1px solid var(--line);color:var(--ink3);margin-left:8px;vertical-align:1px}
+.badge.done{color:var(--ok);border-color:color-mix(in srgb, var(--ok) 45%, transparent)}
+.badge.doing{color:var(--gold);border-color:color-mix(in srgb, var(--gold) 45%, transparent)}
+</style>
+</head><body><div class="wrap">
 
 <div class="date">2026-11-05</div>
 <h1>Отчёт за 2026-11-05</h1>
-<h1>2026-11-05</h1>
-<h2>Что сделано</h2>
+<div class="card"><h2>2026-11-05</h2>
+<h3>Что сделано</h3>
 <ul>
 <li>Проверил SYNTX: аккаунт жив, но подписка VIP истекла — генерация требует активной подписки, 48,674 токена лежат без дела.</li>
 <li>Сгенерировал тестовую картинку без аккаунтов (открытый API pollinations): <code>zenobia-test.jpg</code>, 576×1024.</li>
@@ -46,22 +49,25 @@ code{background:var(--bg2);padding:1px 6px;border-radius:4px;font-size:15px;colo
 <li>Поставил Hammerspoon и написал конфиг раскладок: <code>⌃⌥⇧1…5</code> — запомнить стол, <code>⌃⌥1…5</code> — вернуть. Проверено: окна возвращаются.</li>
 <li>Завёл два репозитория: приватный <code>daily</code> (всё личное) и публичный <code>daily-site</code> (только обзор).</li>
 </ul>
-<h2>Что двинулось</h2>
+<h3>Что двинулось</h3>
 <ul>
 <li>Раскладки рабочих столов: от идеи «найти программу» до работающих горячих клавиш.</li>
 <li>Публичный сайт обзора поднят: https://yanm00re.github.io/daily-site/</li>
 </ul>
-<h2>Где застряло</h2>
+<h3>Где застряло</h3>
 <ul>
 <li>Moom не поставить: файл на manytricks.com приходит обрезанным (15 МБ вместо 23), диск не монтируется.</li>
 <li>Системные службы мака сыпятся: DNS, <code>sysmond</code>, <code>launchd</code>, <code>codesign</code>, <code>DiskArbitration</code>. Лечится перезагрузкой.</li>
 <li><code>gh</code> не видит связку ключей из песочницы — токен вынесен в файл и отдаётся git через свой credential helper.</li>
 </ul>
-<h2>Что дальше</h2>
+<h3>Что дальше</h3>
 <ul>
 <li>Перезагрузить мак и проверить, что DNS и монтирование образов вернулись.</li>
 <li>Решить судьбу SYNTX: продлевать подписку или жить на бесплатных генераторах.</li>
 </ul>
+<ul>
+<li><b>13:18</b> не очень удобно что чтобы сделать &quot;Публично&quot;, надо жать &quot;Скрыто&quot;. Я бы хотел тумблер как в Mac os</li>
+</ul></div>
 
 <div class="rule"></div>
 <p class="meta"><a href="../index.html">← к текущему обзору</a></p>
