@@ -220,7 +220,7 @@ padding:3px 7px;border-radius:7px;cursor:pointer}
   <div class="body"><div>не очень удобно что чтобы сделать &quot;Публично&quot;, надо жать &quot;Скрыто&quot;. Я бы хотел тумблер как в Mac os</div></div>
 </div></div></details><details class="section" id="done" open data-search="Закрыто"><summary><span class="chev">›</span><span class="led blue"></span><h2>Закрыто</h2><span class="sec-tools"><button class="mvjs" data-dir="-1" title="выше">↑</button><button class="mvjs" data-dir="1" title="ниже">↓</button></span></summary><div class="tasks"><p class="empty">Пока пусто.</p></div></details><details class="section" id="reports" open data-search="Отчёты по дням"><summary><span class="chev">›</span><span class="led blue"></span><h2>Отчёты по дням</h2><span class="sec-tools"><button class="mvjs" data-dir="-1" title="выше">↑</button><button class="mvjs" data-dir="1" title="ниже">↓</button></span></summary><a href="r/2026-11-05.html">2026-11-05</a></details>
 </div>
-<p class="meta">Собрано 05.11.2026 22:56. Здесь только то, что отмечено как публичное.</p>
+<p class="meta">Собрано 05.11.2026 23:11. Здесь только то, что отмечено как публичное.</p>
 
 </div>
 <script>
@@ -314,24 +314,51 @@ padding:3px 7px;border-radius:7px;cursor:pointer}
       o.frequency.setValueAtTime(160,t); o.frequency.exponentialRampToValueAtTime(45,t+0.12);
       g.gain.setValueAtTime(0.9,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.28);
       o.connect(g).connect(ac.destination); o.start(t); o.stop(t+0.3); } },
-    snare: { name:"Снейр", play: function(ac,t){ var b=ac.createBuffer(1,ac.sampleRate*0.2,ac.sampleRate),d=b.getChannelData(0);
+    '808': { name:"808 Бас", play: function(ac,t){ var o=ac.createOscillator(),g=ac.createGain(); o.type='sine';
+      o.frequency.setValueAtTime(100,t); o.frequency.exponentialRampToValueAtTime(38,t+0.12);
+      g.gain.setValueAtTime(0.9,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.5);
+      o.connect(g).connect(ac.destination); o.start(t); o.stop(t+0.52); } },
+    snare: { name:"Снейр", play: function(ac,t){
+      var b=ac.createBuffer(1,ac.sampleRate*0.25,ac.sampleRate),d=b.getChannelData(0);
       for(var i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,2);
       var s=ac.createBufferSource(),f=ac.createBiquadFilter(),g=ac.createGain();
-      f.type='bandpass'; f.frequency.value=1800; g.gain.value=0.7;
+      f.type='bandpass'; f.frequency.value=2000; f.Q.value=0.8; g.gain.value=0.95;
       s.buffer=b; s.connect(f).connect(g).connect(ac.destination); s.start(t);
-      var o=ac.createOscillator(),g2=ac.createGain(); o.type='triangle'; o.frequency.value=190;
-      g2.gain.setValueAtTime(0.25,t); g2.gain.exponentialRampToValueAtTime(0.001,t+0.1);
-      o.connect(g2).connect(ac.destination); o.start(t); o.stop(t+0.11); } },
-    hat:   { name:"Хэт", play: function(ac,t){ var b=ac.createBuffer(1,ac.sampleRate*0.05,ac.sampleRate),d=b.getChannelData(0);
-      for(var i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,3);
-      var s=ac.createBufferSource(),f=ac.createBiquadFilter(),g=ac.createGain();
-      f.type='highpass'; f.frequency.value=8000; g.gain.value=0.35;
-      s.buffer=b; s.connect(f).connect(g).connect(ac.destination); s.start(t); } },
+      var o=ac.createOscillator(),g2=ac.createGain(); o.type='sine'; o.frequency.value=180;
+      g2.gain.setValueAtTime(0.5,t); g2.gain.exponentialRampToValueAtTime(0.001,t+0.09);
+      o.connect(g2).connect(ac.destination); o.start(t); o.stop(t+0.1);
+      var b2=ac.createBuffer(1,ac.sampleRate*0.08,ac.sampleRate),d2=b2.getChannelData(0);
+      for(var j=0;j<d2.length;j++) d2[j]=(Math.random()*2-1)*Math.pow(1-j/d2.length,2);
+      var s2=ac.createBufferSource(),f2=ac.createBiquadFilter(),g3=ac.createGain();
+      f2.type='highpass'; f2.frequency.value=4000; g3.gain.value=0.3;
+      s2.buffer=b2; s2.connect(f2).connect(g3).connect(ac.destination); s2.start(t); } },
     clap:  { name:"Хлоп", play: function(ac,t){ var b=ac.createBuffer(1,ac.sampleRate*0.12,ac.sampleRate),d=b.getChannelData(0);
       for(var i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,1.5);
       var s=ac.createBufferSource(),f=ac.createBiquadFilter(),g=ac.createGain();
       f.type='bandpass'; f.frequency.value=1300; g.gain.value=0.55;
       s.buffer=b; s.connect(f).connect(g).connect(ac.destination); s.start(t); } },
+    rim:   { name:"Рим", play: function(ac,t){ var o=ac.createOscillator(),g=ac.createGain(); o.type='sine'; o.frequency.value=1400;
+      g.gain.setValueAtTime(0.4,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.04);
+      o.connect(g).connect(ac.destination); o.start(t); o.stop(t+0.05); } },
+    hat:   { name:"Хэт", play: function(ac,t){ var b=ac.createBuffer(1,ac.sampleRate*0.05,ac.sampleRate),d=b.getChannelData(0);
+      for(var i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,3);
+      var s=ac.createBufferSource(),f=ac.createBiquadFilter(),g=ac.createGain();
+      f.type='highpass'; f.frequency.value=8000; g.gain.value=0.35;
+      s.buffer=b; s.connect(f).connect(g).connect(ac.destination); s.start(t); } },
+    openhat:{ name:"Хэт откр.", play: function(ac,t){ var b=ac.createBuffer(1,ac.sampleRate*0.35,ac.sampleRate),d=b.getChannelData(0);
+      for(var i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,2);
+      var s=ac.createBufferSource(),f=ac.createBiquadFilter(),g=ac.createGain();
+      f.type='highpass'; f.frequency.value=6500; g.gain.value=0.3;
+      s.buffer=b; s.connect(f).connect(g).connect(ac.destination); s.start(t); } },
+    shaker: { name:"Шейкер", play: function(ac,t){ var b=ac.createBuffer(1,ac.sampleRate*0.18,ac.sampleRate),d=b.getChannelData(0);
+      for(var i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,2)*Math.abs(Math.sin(i*0.5));
+      var s=ac.createBufferSource(),f=ac.createBiquadFilter(),g=ac.createGain();
+      f.type='highpass'; f.frequency.value=5000; g.gain.value=0.25;
+      s.buffer=b; s.connect(f).connect(g).connect(ac.destination); s.start(t); } },
+    cowbell:{ name:"Коубэлл", play: function(ac,t){ [540,800].forEach(function(fr){
+      var o=ac.createOscillator(),g=ac.createGain(); o.type='square'; o.frequency.value=fr;
+      g.gain.setValueAtTime(0.25,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.18);
+      o.connect(g).connect(ac.destination); o.start(t); o.stop(t+0.2); }); } },
     tom:   { name:"Том", play: function(ac,t){ var o=ac.createOscillator(),g=ac.createGain(); o.type='sine';
       o.frequency.setValueAtTime(220,t); o.frequency.exponentialRampToValueAtTime(110,t+0.18);
       g.gain.setValueAtTime(0.55,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.22);
@@ -340,9 +367,25 @@ padding:3px 7px;border-radius:7px;cursor:pointer}
       o.type='sawtooth'; o.frequency.value = freq || 55; f.type='lowpass'; f.frequency.value = Math.min(1400, (freq||55) * 6 + 200);
       g.gain.setValueAtTime(0.55,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.26);
       o.connect(f).connect(g).connect(ac.destination); o.start(t); o.stop(t+0.28); } },
+    sub:   { name:"Саб", play: function(ac,t,freq){ var o=ac.createOscillator(),g=ac.createGain(); o.type='sine';
+      o.frequency.value = freq ? freq/2 : 45; g.gain.setValueAtTime(0.6,t);
+      g.gain.exponentialRampToValueAtTime(0.001,t+0.4);
+      o.connect(g).connect(ac.destination); o.start(t); o.stop(t+0.42); } },
+    pluck: { name:"Плик", play: function(ac,t,freq){ var o=ac.createOscillator(),f=ac.createBiquadFilter(),g=ac.createGain();
+      o.type='triangle'; o.frequency.value = freq || 220; f.type='lowpass'; f.frequency.value = Math.min(6000, (freq||220)*4);
+      g.gain.setValueAtTime(0.4,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.14);
+      o.connect(f).connect(g).connect(ac.destination); o.start(t); o.stop(t+0.16); } },
+    chord: { name:"Аккорд", play: function(ac,t,freq){ var base=freq||220; [1,1.26,1.5].forEach(function(m){
+      var o=ac.createOscillator(),f=ac.createBiquadFilter(),g=ac.createGain(); o.type='sawtooth'; o.frequency.value=base*m;
+      f.type='lowpass'; f.frequency.value=2000; g.gain.setValueAtTime(0.18,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.3);
+      o.connect(f).connect(g).connect(ac.destination); o.start(t); o.stop(t+0.32); }); } },
     blip:  { name:"Блип", play: function(ac,t){ var o=ac.createOscillator(),g=ac.createGain(); o.type='square'; o.frequency.value=880;
       g.gain.setValueAtTime(0.25,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.07);
       o.connect(g).connect(ac.destination); o.start(t); o.stop(t+0.08); } },
+    zap:   { name:"Зап", play: function(ac,t,freq){ var o=ac.createOscillator(),g=ac.createGain(); o.type='square';
+      o.frequency.setValueAtTime((freq||440)*4,t); o.frequency.exponentialRampToValueAtTime(freq||440,t+0.1);
+      g.gain.setValueAtTime(0.25,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.12);
+      o.connect(g).connect(ac.destination); o.start(t); o.stop(t+0.13); } },
   };
 
   var AC = null;
@@ -613,7 +656,10 @@ padding:3px 7px;border-radius:7px;cursor:pointer}
 
   var addBtn = document.getElementById('addrow');
   if (addBtn) addBtn.addEventListener('click', function(){
-    rows().push({ inst:'kick', color:'cyan', pitched:false, steps:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] });
+    // дорожка добавляется сразу во ВСЕ паттерны (A/B/C/D), у каждого своя копия
+    patterns.forEach(function(p){
+      p.rows.push({ inst:'kick', color:'cyan', pitched:false, steps:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] });
+    });
     save(); renderRows();
   });
 
@@ -671,7 +717,7 @@ padding:3px 7px;border-radius:7px;cursor:pointer}
   function midiFile(){
     var bpm = currentBpm();
     var tpq = 480, six = 120;
-    var NOTE = { kick:36, snare:38, hat:42, clap:39, tom:45, bass:33, blip:80 };
+    var NOTE = { kick:36, '808':36, snare:38, rim:37, hat:42, openhat:46, shaker:44, cowbell:56, clap:39, tom:45, bass:33, blip:80 };
     var usec = Math.round(60000000 / bpm);
     var events = [];
     patterns.forEach(function(p, pi){
