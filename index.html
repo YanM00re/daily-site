@@ -145,6 +145,18 @@ details.section > summary:hover .chev{color:var(--red)}
 .pad:hover{transform:scale(1.07)}
 .pad.on{border-color:transparent;box-shadow:0 0 12px currentColor;background:currentColor}
 .pad.playhead{outline:2px solid var(--ink);outline-offset:1px;transform:scale(1.1)}
+.notepicker{position:fixed;z-index:50;display:none;background:var(--panel);border:1px solid var(--line);
+border-radius:var(--radius);padding:8px;grid-template-columns:repeat(5,1fr);gap:6px;
+box-shadow:0 12px 30px rgba(0,0,0,.45)}
+.notepicker.open{display:grid}
+.notepicker button{font:inherit;font-size:12px;padding:6px 9px;border-radius:7px;border:1px solid var(--line);
+background:var(--bg);color:var(--ink);cursor:pointer}
+.notepicker button:hover{border-color:var(--orange);color:var(--orange)}
+.notepicker button.on{border-color:var(--accent);color:var(--accent)}
+.row .mini{font:inherit;font-size:12px;background:transparent;border:1px solid var(--line);color:var(--ink3);
+padding:3px 7px;border-radius:7px;cursor:pointer}
+.row .mini:hover{color:var(--red);border-color:var(--red)}
+.row .mini.pitch.on{color:var(--lime);border-color:var(--lime)}
 .pads-note{color:var(--ink3);font-size:12px;margin-top:12px}
 @media(max-width:720px){.row{grid-template-columns:1fr}}
 </style>
@@ -176,15 +188,7 @@ details.section > summary:hover .chev{color:var(--red)}
   <div class="hint" id="qhint"></div>
 </div>
 <div id="sections">
-<details class="section" id="work" open data-search="В работе"><summary><span class="chev">›</span><span class="led orange"></span><h2>В работе</h2><span class="sec-tools"><button class="mvjs" data-dir="-1" title="выше">↑</button><button class="mvjs" data-dir="1" title="ниже">↓</button></span></summary><div class="tasks"><p class="empty">Публичных дел сейчас нет.</p></div></details><details class="section" id="journal" open data-search="Дневник"><summary><span class="chev">›</span><span class="led blue"></span><h2>Дневник</h2><span class="sec-tools"><button class="mvjs" data-dir="-1" title="выше">↑</button><button class="mvjs" data-dir="1" title="ниже">↓</button></span></summary><div class="timeline">
-<div class="tentry " data-search="13:24 нравится бумажная тема">
-  <div class="head"><span class="time">13:24</span><span class="peek">нравится бумажная тема</span></div>
-  <div class="body"><div>нравится бумажная тема</div></div>
-</div>
-<div class="tentry " data-search="13:18 не очень удобно что чтобы сделать &quot;Публично&quot;, надо жать &quot;Скрыто&quot;. Я бы хотел тумблер как в Mac os">
-  <div class="head"><span class="time">13:18</span><span class="peek">не очень удобно что чтобы сделать &quot;Публично&quot;, надо жать &quot;Скрыто&quot;. Я бы хотел тумблер как в</span></div>
-  <div class="body"><div>не очень удобно что чтобы сделать &quot;Публично&quot;, надо жать &quot;Скрыто&quot;. Я бы хотел тумблер как в Mac os</div></div>
-</div></div></details><details class="section" id="done" open data-search="Закрыто"><summary><span class="chev">›</span><span class="led blue"></span><h2>Закрыто</h2><span class="sec-tools"><button class="mvjs" data-dir="-1" title="выше">↑</button><button class="mvjs" data-dir="1" title="ниже">↓</button></span></summary><div class="tasks"><p class="empty">Пока пусто.</p></div></details><details class="section" id="reports" open data-search="Отчёты по дням"><summary><span class="chev">›</span><span class="led blue"></span><h2>Отчёты по дням</h2><span class="sec-tools"><button class="mvjs" data-dir="-1" title="выше">↑</button><button class="mvjs" data-dir="1" title="ниже">↓</button></span></summary><a href="r/2026-11-05.html">2026-11-05</a></details><details class="section" id="seq" open data-search="Секвенсер"><summary><span class="chev">›</span><span class="led red"></span><h2>Секвенсер</h2><span class="sec-tools"><button class="mvjs" data-dir="-1" title="выше">↑</button><button class="mvjs" data-dir="1" title="ниже">↓</button></span></summary>
+<details class="section" id="seq" open data-search="Секвенсер"><summary><span class="chev">›</span><span class="led red"></span><h2>Секвенсер</h2><span class="sec-tools"><button class="mvjs" data-dir="-1" title="выше">↑</button><button class="mvjs" data-dir="1" title="ниже">↓</button></span></summary>
 <div class="seq">
   <div class="seq-head">
     <button class="play" id="play">▶ Играть</button>
@@ -199,13 +203,22 @@ details.section > summary:hover .chev{color:var(--red)}
     </div>
     <button class="exp" id="expmidi">MIDI ↓</button>
     <button class="exp" id="expwav">WAV ↓</button>
+    <button class="exp" id="addrow">＋ дорожка</button>
     <div class="stepinfo" id="stepinfo">шаг 0 / 16</div>
   </div>
   <div class="rows" id="rows"></div>
   <div class="pads-note">столбец — шаг, строка — инструмент. Звук и цвет меняются прямо здесь, всё звучит и экспортируется.</div>
-</div></details>
+</div></details><details class="section" id="work" open data-search="В работе"><summary><span class="chev">›</span><span class="led orange"></span><h2>В работе</h2><span class="sec-tools"><button class="mvjs" data-dir="-1" title="выше">↑</button><button class="mvjs" data-dir="1" title="ниже">↓</button></span></summary><div class="tasks"><p class="empty">Публичных дел сейчас нет.</p></div></details><details class="section" id="journal" open data-search="Дневник"><summary><span class="chev">›</span><span class="led blue"></span><h2>Дневник</h2><span class="sec-tools"><button class="mvjs" data-dir="-1" title="выше">↑</button><button class="mvjs" data-dir="1" title="ниже">↓</button></span></summary><div class="timeline">
+<div class="tentry " data-search="13:24 нравится бумажная тема">
+  <div class="head"><span class="time">13:24</span><span class="peek">нравится бумажная тема</span></div>
+  <div class="body"><div>нравится бумажная тема</div></div>
 </div>
-<p class="meta">Собрано 05.11.2026 15:12. Здесь только то, что отмечено как публичное.</p>
+<div class="tentry " data-search="13:18 не очень удобно что чтобы сделать &quot;Публично&quot;, надо жать &quot;Скрыто&quot;. Я бы хотел тумблер как в Mac os">
+  <div class="head"><span class="time">13:18</span><span class="peek">не очень удобно что чтобы сделать &quot;Публично&quot;, надо жать &quot;Скрыто&quot;. Я бы хотел тумблер как в</span></div>
+  <div class="body"><div>не очень удобно что чтобы сделать &quot;Публично&quot;, надо жать &quot;Скрыто&quot;. Я бы хотел тумблер как в Mac os</div></div>
+</div></div></details><details class="section" id="done" open data-search="Закрыто"><summary><span class="chev">›</span><span class="led blue"></span><h2>Закрыто</h2><span class="sec-tools"><button class="mvjs" data-dir="-1" title="выше">↑</button><button class="mvjs" data-dir="1" title="ниже">↓</button></span></summary><div class="tasks"><p class="empty">Пока пусто.</p></div></details><details class="section" id="reports" open data-search="Отчёты по дням"><summary><span class="chev">›</span><span class="led blue"></span><h2>Отчёты по дням</h2><span class="sec-tools"><button class="mvjs" data-dir="-1" title="выше">↑</button><button class="mvjs" data-dir="1" title="ниже">↓</button></span></summary><a href="r/2026-11-05.html">2026-11-05</a></details>
+</div>
+<p class="meta">Собрано 05.11.2026 15:33. Здесь только то, что отмечено как публичное.</p>
 
 </div>
 <script>
@@ -294,7 +307,7 @@ details.section > summary:hover .chev{color:var(--red)}
   var NOTE_NAMES = ["A2","C3","D3","E3","G3","A3","C4","D4","E4","G4"];
   function freqOf(midi){ return 440 * Math.pow(2, (midi - 69) / 12); }
 
-  var INST = {
+  var SYNTH = {
     kick:  { name:"Кик", play: function(ac,t){ var o=ac.createOscillator(),g=ac.createGain(); o.type='sine';
       o.frequency.setValueAtTime(160,t); o.frequency.exponentialRampToValueAtTime(45,t+0.12);
       g.gain.setValueAtTime(0.9,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.28);
@@ -322,7 +335,7 @@ details.section > summary:hover .chev{color:var(--red)}
       g.gain.setValueAtTime(0.55,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.22);
       o.connect(g).connect(ac.destination); o.start(t); o.stop(t+0.24); } },
     bass:  { name:"Бас", play: function(ac,t,freq){ var o=ac.createOscillator(),f=ac.createBiquadFilter(),g=ac.createGain();
-      o.type='sawtooth'; o.frequency.value = freq || 55; f.type='lowpass'; f.frequency.value = Math.min(1200, (freq||55) * 6 + 200);
+      o.type='sawtooth'; o.frequency.value = freq || 55; f.type='lowpass'; f.frequency.value = Math.min(1400, (freq||55) * 6 + 200);
       g.gain.setValueAtTime(0.55,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.26);
       o.connect(f).connect(g).connect(ac.destination); o.start(t); o.stop(t+0.28); } },
     blip:  { name:"Блип", play: function(ac,t){ var o=ac.createOscillator(),g=ac.createGain(); o.type='square'; o.frequency.value=880;
@@ -330,101 +343,237 @@ details.section > summary:hover .chev{color:var(--red)}
       o.connect(g).connect(ac.destination); o.start(t); o.stop(t+0.08); } },
   };
 
-  var saved = null;
-  try { saved = JSON.parse(localStorage.getItem('seq') || 'null'); } catch(e){}
-  var rows = saved || [
-    { inst:'kick',  color:'red',    steps:[1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0] },
-    { inst:'hat',   color:'amber',  steps:[0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,1] },
-    { inst:'snare', color:'blue',   steps:[0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0] },
-    { inst:'bass',  color:'violet', steps:[0,0,0,0, 0,0,1,0, 0,0,0,0, 0,0,1,0] },
-  ];
-
   var AC = null;
   function audio(){ return AC || (AC = new (window.AudioContext||window.webkitAudioContext)()); }
 
+  var buffers = {};
+  function loadBuffer(url){
+    if (!buffers[url]) {
+      buffers[url] = fetch(url)
+        .then(function(r){ if (!r.ok) throw new Error('404'); return r.arrayBuffer(); })
+        .then(function(ab){ return audio().decodeAudioData(ab); });
+    }
+    return buffers[url];
+  }
+
+  function isSample(inst){ return inst && inst.charAt(0) === 's'; }
+  function sampleUrl(inst){ return inst.slice(2); }
+
+  function playNow(inst, freq, t){
+    var ac = audio();
+    if (isSample(inst)) {
+      loadBuffer(sampleUrl(inst)).then(function(buf){
+        var s = ac.createBufferSource(); s.buffer = buf;
+        if (freq) s.playbackRate.value = freq / freqOf(45);
+        var g = ac.createGain(); g.gain.value = 0.9;
+        s.connect(g).connect(ac.destination);
+        s.start(t || ac.currentTime);
+      }).catch(function(){});
+    } else if (SYNTH[inst]) {
+      SYNTH[inst].play(ac, t || ac.currentTime, freq);
+    }
+  }
+
+  var samples = null;
+  fetch('/samples.json').then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(data){ samples = data; buildSelects(); }).catch(function(){ samples = null; });
+
+  var saved = null;
+  try { saved = JSON.parse(localStorage.getItem('seq') || 'null'); } catch(e){}
+  var rows = saved || [
+    { inst:'kick',  color:'red',    pitched:false, steps:[1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0] },
+    { inst:'hat',   color:'amber',  pitched:false, steps:[0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,1] },
+    { inst:'snare', color:'blue',   pitched:false, steps:[0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0] },
+    { inst:'bass',  color:'violet', pitched:true,  steps:[0,0,0,0, 0,0,3,0, 0,0,0,0, 0,0,5,0] },
+  ];
+
   var rowsEl = document.getElementById('rows');
-  rows.forEach(function(r){
-    var rowEl = document.createElement('div'); rowEl.className = 'row';
-    var head = document.createElement('div'); head.className = 'row-head';
-    var sel = document.createElement('select');
-    Object.keys(INST).forEach(function(k){
-      var o = document.createElement('option'); o.value = k; o.textContent = INST[k].name;
-      if (k === r.inst) o.selected = true; sel.appendChild(o);
+  var picker = document.createElement('div'); picker.className = 'notepicker';
+  document.body.appendChild(picker);
+  function closePicker(){ picker.classList.remove('open'); }
+  document.addEventListener('click', function(e){ if (!picker.contains(e.target)) closePicker(); });
+
+  function instOptions(){
+    var out = [];
+    Object.keys(SYNTH).forEach(function(k){ out.push({ value:k, label:SYNTH[k].name, group:'Синтез' }); });
+    if (samples) {
+      Object.keys(samples).forEach(function(cat){
+        samples[cat].forEach(function(s){ out.push({ value:'s:' + s.url, label:'🎧 ' + s.name, group:cat }); });
+      });
+    }
+    return out;
+  }
+
+  function buildSelects(){
+    document.querySelectorAll('.row select[data-inst]').forEach(function(sel){
+      var cur = sel.value;
+      sel.innerHTML = '';
+      var groups = {};
+      instOptions().forEach(function(o){
+        if (!groups[o.group]) { groups[o.group] = document.createElement('optgroup'); groups[o.group].label = o.group; sel.appendChild(groups[o.group]); }
+        var opt = document.createElement('option'); opt.value = o.value; opt.textContent = o.label;
+        groups[o.group].appendChild(opt);
+      });
+      sel.value = cur;
     });
-    sel.addEventListener('change', function(){
-      r.inst = sel.value;
-      if (r.inst !== 'bass') { r.steps = r.steps.map(function(x){ return x ? 1 : 0; }); }
-      r.refreshPads.forEach(function(fn){ fn(); });
-      save();
-    });
-    head.appendChild(sel);
-    var sw = document.createElement('div'); sw.className = 'swatches';
-    Object.keys(COLORS).forEach(function(name){
-      var hex = COLORS[name];
-      var s = document.createElement('div'); s.className = 'swatch' + (r.color===name?' on':'');
-      s.style.background = hex; s.title = name;
-      s.addEventListener('click', function(){
-        r.color = name;
-        sw.querySelectorAll('.swatch').forEach(function(x){x.classList.remove('on')});
-        s.classList.add('on');
-        rowEl.querySelectorAll('.pad').forEach(function(p){ p.style.color = hex; });
+  }
+
+  function save(){
+    localStorage.setItem('seq', JSON.stringify(rows.map(function(r){
+      return { inst:r.inst, color:r.color, pitched:!!r.pitched, steps:r.steps };
+    })));
+  }
+
+  function refreshPad(r, i){
+    var p = r.padEls[i], on = !!r.steps[i], pitched = on && r.pitched;
+    p.classList.toggle('on', on);
+    p.textContent = pitched ? NOTE_NAMES[r.steps[i]-1] : '';
+    p.style.fontSize = pitched ? '9px' : '';
+    p.style.display = 'grid';
+    p.style.placeItems = 'center';
+    p.style.filter = pitched ? 'brightness(' + (1 + (r.steps[i]-1) * 0.08) + ')' : '';
+  }
+
+  function renderRows(){
+    rowsEl.innerHTML = '';
+    rows.forEach(function(r, ri){
+      var rowEl = document.createElement('div'); rowEl.className = 'row';
+
+      var head = document.createElement('div'); head.className = 'row-head';
+
+      var sel = document.createElement('select');
+      sel.setAttribute('data-inst', '1');
+      var groups = {};
+      instOptions().forEach(function(o){
+        if (!groups[o.group]) { groups[o.group] = document.createElement('optgroup'); groups[o.group].label = o.group; sel.appendChild(groups[o.group]); }
+        var opt = document.createElement('option'); opt.value = o.value; opt.textContent = o.label;
+        groups[o.group].appendChild(opt);
+      });
+      sel.value = r.inst;
+      sel.addEventListener('change', function(){
+        r.inst = sel.value;
+        if (!r.pitched) r.steps = r.steps.map(function(x){ return x ? 1 : 0; });
+        r.padEls.forEach(function(p, i){ refreshPad(r, i); });
         save();
       });
-      sw.appendChild(s);
-    });
-    head.appendChild(sw);
-    rowEl.appendChild(head);
-    var stepsEl = document.createElement('div'); stepsEl.className = 'steps';
-    r.padEls = [];
-    r.refreshPads = [];
-    for (var i = 0; i < 16; i++) { (function(i){
-      var p = document.createElement('div');
-      p.className = 'pad';
-      p.style.color = COLORS[r.color];
-      function refresh(){
-        var on = !!r.steps[i];
-        p.classList.toggle('on', on);
-        var pitched = on && r.inst === 'bass';
-        p.textContent = pitched ? NOTE_NAMES[r.steps[i]-1] : '';
-        p.style.fontSize = pitched ? '9px' : '';
-        p.style.display = 'grid';
-        p.style.placeItems = 'center';
-        p.style.filter = pitched ? 'brightness(' + (1 + (r.steps[i]-1) * 0.08) + ')' : '';
-      }
-      p.addEventListener('click', function(){
-        if (r.inst === 'bass') {
-          if (!r.steps[i]) r.steps[i] = 1;
-          else if (r.steps[i] >= PENTA.length) r.steps[i] = 0;
-          else r.steps[i] += 1;
-        } else {
-          r.steps[i] = r.steps[i] ? 0 : 1;
-        }
-        refresh();
-        if (r.steps[i]) {
-          var f = (r.inst === 'bass') ? freqOf(PENTA[r.steps[i]-1]) : undefined;
-          INST[r.inst].play(audio(), audio().currentTime, f);
-        }
+      head.appendChild(sel);
+
+      var pitchBtn = document.createElement('button');
+      pitchBtn.className = 'mini pitch' + (r.pitched ? ' on' : '');
+      pitchBtn.textContent = '♪';
+      pitchBtn.title = 'нотный режим: каждый шаг — своя высота';
+      pitchBtn.addEventListener('click', function(){
+        r.pitched = !r.pitched;
+        if (!r.pitched) r.steps = r.steps.map(function(x){ return x ? 1 : 0; });
+        pitchBtn.classList.toggle('on', r.pitched);
+        r.padEls.forEach(function(p, i){ refreshPad(r, i); });
         save();
       });
-      stepsEl.appendChild(p);
-      r.padEls.push(p);
-      r.refreshPads.push(refresh);
-      refresh();
-    })(i); }
-    rowEl.appendChild(stepsEl);
-    rowsEl.appendChild(rowEl);
+      head.appendChild(pitchBtn);
+
+      var sw = document.createElement('div'); sw.className = 'swatches';
+      Object.keys(COLORS).forEach(function(name){
+        var hex = COLORS[name];
+        var s = document.createElement('div');
+        s.className = 'swatch' + (r.color === name ? ' on' : '');
+        s.style.background = hex; s.title = name;
+        s.addEventListener('click', function(){
+          r.color = name;
+          sw.querySelectorAll('.swatch').forEach(function(x){ x.classList.remove('on'); });
+          s.classList.add('on');
+          r.padEls.forEach(function(p){ p.style.color = hex; });
+          save();
+        });
+        sw.appendChild(s);
+      });
+      head.appendChild(sw);
+
+      var up = document.createElement('button'); up.className = 'mini'; up.textContent = '↑'; up.title = 'выше';
+      up.addEventListener('click', function(){
+        if (ri > 0) { rows.splice(ri, 1); rows.splice(ri - 1, 0, r); save(); renderRows(); }
+      });
+      var down = document.createElement('button'); down.className = 'mini'; down.textContent = '↓'; down.title = 'ниже';
+      down.addEventListener('click', function(){
+        if (ri < rows.length - 1) { rows.splice(ri, 1); rows.splice(ri + 1, 0, r); save(); renderRows(); }
+      });
+      var del = document.createElement('button'); del.className = 'mini'; del.textContent = '×'; del.title = 'удалить дорожку';
+      del.addEventListener('click', function(){
+        if (rows.length <= 1) return;
+        if (confirm('Удалить эту дорожку?')) { rows.splice(ri, 1); save(); renderRows(); }
+      });
+      head.appendChild(up); head.appendChild(down); head.appendChild(del);
+
+      rowEl.appendChild(head);
+
+      var stepsEl = document.createElement('div'); stepsEl.className = 'steps';
+      r.padEls = [];
+      for (var i = 0; i < 16; i++) { (function(i){
+        var p = document.createElement('div');
+        p.className = 'pad';
+        p.style.color = COLORS[r.color];
+        p.addEventListener('click', function(){
+          if (r.pitched) {
+            if (!r.steps[i]) r.steps[i] = 1;
+            else r.steps[i] = 0;
+          } else {
+            r.steps[i] = r.steps[i] ? 0 : 1;
+          }
+          refreshPad(r, i);
+          if (r.steps[i]) {
+            playNow(r.inst, r.pitched ? freqOf(PENTA[r.steps[i]-1]) : undefined, audio().currentTime);
+          }
+          save();
+        });
+        p.addEventListener('contextmenu', function(e){
+          if (!r.pitched) return;
+          e.preventDefault();
+          openPicker(r, i, e.clientX, e.clientY);
+        });
+        stepsEl.appendChild(p);
+        r.padEls.push(p);
+        refreshPad(r, i);
+      })(i); }
+      rowEl.appendChild(stepsEl);
+      rowsEl.appendChild(rowEl);
+    });
+  }
+
+  function openPicker(r, i, x, y){
+    picker.innerHTML = '';
+    NOTE_NAMES.forEach(function(n, idx){
+      var b = document.createElement('button');
+      b.textContent = n;
+      if (r.steps[i] === idx + 1) b.className = 'on';
+      b.addEventListener('click', function(){
+        r.steps[i] = idx + 1;
+        refreshPad(r, i);
+        closePicker();
+        playNow(r.inst, freqOf(PENTA[idx]), audio().currentTime);
+        save();
+      });
+      picker.appendChild(b);
+    });
+    picker.style.left = Math.min(x, window.innerWidth - 240) + 'px';
+    picker.style.top = Math.min(y, window.innerHeight - 140) + 'px';
+    picker.classList.add('open');
+  }
+
+  renderRows();
+
+  var addBtn = document.getElementById('addrow');
+  if (addBtn) addBtn.addEventListener('click', function(){
+    rows.push({ inst:'kick', color:'cyan', pitched:false, steps:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] });
+    save(); renderRows();
   });
-  function save(){ localStorage.setItem('seq', JSON.stringify(rows.map(function(r){return {inst:r.inst,color:r.color,steps:r.steps}}))); }
 
   var playing = false, step = 0, timer = null;
   function currentBpm(){ return Math.min(180, Math.max(60, +document.getElementById('bpm').value || 96)); }
   function tickSeq(){
-    rows.forEach(function(r){ r.padEls.forEach(function(p,i){ p.classList.toggle('playhead', i===step); }); });
-    document.getElementById('stepinfo').textContent = 'шаг ' + (step+1) + ' / 16';
+    rows.forEach(function(r){ r.padEls.forEach(function(p, i){ p.classList.toggle('playhead', i === step); }); });
+    document.getElementById('stepinfo').textContent = 'шаг ' + (step + 1) + ' / 16';
     rows.forEach(function(r){
       if (r.steps[step]) {
-        var f = (r.inst === 'bass') ? freqOf(PENTA[r.steps[step]-1]) : undefined;
-        INST[r.inst].play(audio(), audio().currentTime, f);
+        playNow(r.inst, r.pitched ? freqOf(PENTA[r.steps[step]-1]) : undefined, audio().currentTime);
       }
     });
     step = (step + 1) % 16;
@@ -468,7 +617,7 @@ details.section > summary:hover .chev{color:var(--red)}
       for (var bar = 0; bar < bars; bar++) {
         r.steps.forEach(function(on, i){
           if (!on) return;
-          var note = (r.inst === 'bass') ? PENTA[on - 1] : (NOTE[r.inst] || 36);
+          var note = r.pitched ? PENTA[on - 1] : (isSample(r.inst) ? 36 : (NOTE[r.inst] || 36));
           events.push([bar * 16 * six + i * six, note]);
         });
       }
@@ -512,18 +661,40 @@ details.section > summary:hover .chev{color:var(--red)}
     var bpm = currentBpm();
     var stepDur = 60 / bpm / 4, total = stepDur * 16 * bars;
     var sr = 44100;
-    var off = new OfflineAudioContext(2, Math.ceil(sr * (total + 0.5)), sr);
+    audio();
+    var loads = [];
     rows.forEach(function(r){
-      for (var bar = 0; bar < bars; bar++) {
-        r.steps.forEach(function(on, i){
-          if (!on) return;
-          var f = (r.inst === 'bass') ? freqOf(PENTA[on - 1]) : undefined;
-          INST[r.inst].play(off, bar * 16 * stepDur + i * stepDur, f);
-        });
-      }
+      if (isSample(r.inst)) loads.push(loadBuffer(sampleUrl(r.inst)).catch(function(){ return null; }));
     });
-    off.startRendering().then(function(buf){
-      download(wavFromBuffer(buf, sr), 'sequence-' + bpm + 'bpm-' + bars + 'bar.wav');
+    Promise.all(loads).then(function(){
+      var off = new OfflineAudioContext(2, Math.ceil(sr * (total + 0.5)), sr);
+      var jobs = [];
+      rows.forEach(function(r){
+        for (var bar = 0; bar < bars; bar++) {
+          r.steps.forEach(function(on, i){
+            if (!on) return;
+            var f = r.pitched ? freqOf(PENTA[on - 1]) : undefined;
+            var t = bar * 16 * stepDur + i * stepDur;
+            if (isSample(r.inst)) {
+              jobs.push(buffers[sampleUrl(r.inst)].then(function(buf){
+                if (!buf) return;
+                var s = off.createBufferSource(); s.buffer = buf;
+                if (f) s.playbackRate.value = f / freqOf(45);
+                var g = off.createGain(); g.gain.value = 0.9;
+                s.connect(g).connect(off.destination);
+                s.start(t);
+              }).catch(function(){}));
+            } else if (SYNTH[r.inst]) {
+              SYNTH[r.inst].play(off, t, f);
+            }
+          });
+        }
+      });
+      Promise.all(jobs).then(function(){
+        off.startRendering().then(function(buf){
+          download(wavFromBuffer(buf, sr), 'sequence-' + bpm + 'bpm-' + bars + 'bar.wav');
+        });
+      });
     });
   }
   document.getElementById('expmidi').addEventListener('click', function(){

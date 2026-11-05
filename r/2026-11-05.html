@@ -145,6 +145,18 @@ details.section > summary:hover .chev{color:var(--red)}
 .pad:hover{transform:scale(1.07)}
 .pad.on{border-color:transparent;box-shadow:0 0 12px currentColor;background:currentColor}
 .pad.playhead{outline:2px solid var(--ink);outline-offset:1px;transform:scale(1.1)}
+.notepicker{position:fixed;z-index:50;display:none;background:var(--panel);border:1px solid var(--line);
+border-radius:var(--radius);padding:8px;grid-template-columns:repeat(5,1fr);gap:6px;
+box-shadow:0 12px 30px rgba(0,0,0,.45)}
+.notepicker.open{display:grid}
+.notepicker button{font:inherit;font-size:12px;padding:6px 9px;border-radius:7px;border:1px solid var(--line);
+background:var(--bg);color:var(--ink);cursor:pointer}
+.notepicker button:hover{border-color:var(--orange);color:var(--orange)}
+.notepicker button.on{border-color:var(--accent);color:var(--accent)}
+.row .mini{font:inherit;font-size:12px;background:transparent;border:1px solid var(--line);color:var(--ink3);
+padding:3px 7px;border-radius:7px;cursor:pointer}
+.row .mini:hover{color:var(--red);border-color:var(--red)}
+.row .mini.pitch.on{color:var(--lime);border-color:var(--lime)}
 .pads-note{color:var(--ink3);font-size:12px;margin-top:12px}
 @media(max-width:720px){.row{grid-template-columns:1fr}}
 </style>
